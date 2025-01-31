@@ -1790,6 +1790,10 @@ public class AdminController {
 //            reports =  weeklyReportRepo.findReportsByYear(year);
             year = date.getYear();
             reports =  weeklyReportService.getReportsByYear(year);
+
+            if(reports ==null || reports.isEmpty() ){
+                model.addAttribute("message", "Report not found for the year " + year);
+            }
         }
 //        else if (selectedDate.isEmpty()) {
 //            return "report is not found!!!";
