@@ -5,12 +5,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import com.rh4.models.ProjectDefinition;
+import com.rh4.repositories.*;
+import org.apache.kafka.common.network.Mode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +40,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import com.rh4.entities.*;
 import com.rh4.models.ReportFilter;
-import com.rh4.repositories.AdminRepo;
-import com.rh4.repositories.CancelledRepo;
-import com.rh4.repositories.GroupRepo;
-import com.rh4.repositories.InternApplicationRepo;
-import com.rh4.repositories.InternRepo;
-import com.rh4.repositories.UserRepo;
 import com.rh4.services.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -79,7 +83,12 @@ public class AdminController {
     private GuideService guideService;
     @Autowired
     private DataExportService dataExportService;
-
+    @Autowired
+    private ThesisService thesisService;
+    @Autowired
+    private static YearlyReportService yearlyReportService;
+    @Autowired
+    private WeeklyReportRepo weeklyReportRepo;
 
     @Value("${app.storage.base-dir}")
     private String baseDir;
@@ -87,6 +96,12 @@ public class AdminController {
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Autowired
     private GroupEntity groupEntity;
+
+
+    //    constrcctor for the yearly report service -------
+    public AdminController(YearlyReportService yearlyReportService) {
+        this.yearlyReportService = yearlyReportService;
+    }
 
     public static String encodePassword(String rawPassword) {
         return passwordEncoder.encode(rawPassword);
@@ -1456,6 +1471,9 @@ public class AdminController {
         List<WeeklyReport> reports = weeklyReportService.getAllReports();
         groups.sort(Comparator.comparing(GroupEntity::getGroupId));
         model = countNotifications(model);
+
+
+
         mv.addObject("groups", groups);
         mv.addObject("reports", reports);
         mv.addObject("admin", adminName(session));
@@ -1524,7 +1542,10 @@ public class AdminController {
         return mv;
     }
 
-  @GetMapping("/cancellation_requests")
+
+
+
+    @GetMapping("/cancellation_requests")
     public ModelAndView cancellationRequests(Model model) {
         ModelAndView mv = new ModelAndView("/admin/cancellation_requests");
         List<Intern> requestedInterns = internService.getInternsByCancellationStatus("requested");
@@ -1687,5 +1708,102 @@ public class AdminController {
         adminService.changePassword(admin, newPassword);
         return "redirect:/logout";
     }
+    //-------------------------- View all thesis records-----------------------------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------------------------------------------------
+//    @GetMapping("/thesis")
+//    public String viewThesisList(Model model) {
+//        List<Thesis> thesisList = thesisService.getAllTheses();
+//        model.addAttribute("theses", thesisList);
+//        return "thesis_list";
+//    }
 
+
+    // Show form to add a new thesis
+    @GetMapping("thesis/new")
+    public String showThesisForm(Model model) {
+        model.addAttribute("thesis", new Thesis());
+        return "admin/thesis_form"; // This refers to templates/admin/thesis_form.html
+    }
+
+    // Handle adding/updating a thesis record
+    @PostMapping("thesis/save")
+    public String saveThesis(@ModelAttribute("thesis") Thesis thesis) {
+        thesisService.saveThesis(thesis);
+        return "redirect:/bisag/admin/thesis_list";  // Redirect to thesis listing
+    }
+
+    // Show all thesis--------------------
+    @GetMapping("/thesis_list")
+    public String getThesisList(Model model) {
+        List<Thesis> thesisList = thesisService.getAllTheses();
+        model.addAttribute("thesisList", thesisList);
+        return "admin/thesis_list";
+    }
+
+    //Show thesis ID wise-------------------
+    @GetMapping("/thesis_list_detail/{id}")
+    public String getThesisDetails(@PathVariable("id") String id, Model model) {
+        Optional<Thesis> thesis = thesisService.getThesisById(Long.parseLong(id));
+        if (thesis.isPresent()) {
+            model.addAttribute("thesis", thesis);
+            return "admin/thesis_list_detail";  // Matches HTML filename
+        } else {
+            return "error/404";  // A fallback error page
+        }
+    }
+    // Show form to edit an existing thesis
+//    @GetMapping("/thesis/edit/{id}")
+//    public String editThesis(@PathVariable Long id, Model model) {
+//        Thesis thesis = thesisService.getThesisById(id);
+//        model.addAttribute("thesis", thesis);
+//        return "thesis-form";
+//    }
+
+    // Delete a thesis record
+//    @GetMapping("/thesis/delete/{id}")
+//    public String deleteThesis(@PathVariable Long id) {
+//        thesisService.deleteThesis(id);
+//        return "redirect:/admin/thesis";
+//    }
+
+
+//   yearly report controller-------------------------------------
+
+//    @GetMapping("/admin_weekly_report")
+//    public String getReportsByYear(
+//            @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
+//            Model model) {
+//
+//        Map<Integer, List<WeeklyReport>> yearlyReports = weeklyReportService.getReportsBeforeDateGroupedByYear(date);
+//
+//        model.addAttribute("yearlyReports", yearlyReports);
+//        model.addAttribute("selectedDate", date);
+//        return "admin/admin_weekly_report"; // Ensure this matches your Thymeleaf template name
+//    }
+
+
+    @GetMapping("/admin_yearly_report")
+    public String getReportsByYear(@RequestParam(value = "date", required = true) String selectedDate, Model model) {
+        int year = 0;
+        List<WeeklyReport> reports =null;
+        if(selectedDate != null && !selectedDate.isEmpty()){ LocalDate date = LocalDate.parse(selectedDate, DateTimeFormatter.ISO_DATE);
+//            reports =  weeklyReportRepo.findReportsByYear(year);
+            year = date.getYear();
+            reports =  weeklyReportService.getReportsByYear(year);
+        }
+//        else if (selectedDate.isEmpty()) {
+//            return "report is not found!!!";
+//        }
+        else
+        {
+            reports =  weeklyReportService.getAllReports();
+        }
+        model.addAttribute("selectedDate",selectedDate);
+        model.addAttribute("year",year);
+        model.addAttribute("reports", reports);
+
+        return "admin/admin_yearly_report";
+    }
 }
+
+
