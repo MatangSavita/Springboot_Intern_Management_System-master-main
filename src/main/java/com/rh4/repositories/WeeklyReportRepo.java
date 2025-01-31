@@ -28,4 +28,11 @@ public interface WeeklyReportRepo extends JpaRepository<WeeklyReport, Long> {
     WeeklyReport findByWeekNoAndGroup(int weekNo, GroupEntity group);
 
     WeeklyReport findByInternInternIdAndWeekNo(String internId, int weekNo);
+
+    
+    //	for yearly report fetch data ----------------------------
+
+    @Query("SELECT w FROM WeeklyReport w WHERE YEAR(w.reportSubmittedDate) = :year")
+    List<WeeklyReport> findReportsByYear(@Param("year") int year);
+
 }
