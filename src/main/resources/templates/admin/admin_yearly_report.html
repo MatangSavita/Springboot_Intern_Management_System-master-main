@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Yearly Reports</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- Include header -->
+<div th:replace="fragments/headerFragment :: header"></div>
+<!-- Include sidebar -->
+<div th:replace="fragments/asideFragment :: aside"></div>
+
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>Manage Yearly Reports</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/bisag/admin/admin_yearly_report">Reports</a></li>
+        <li class="breadcrumb-item active">Manage Yearly Reports</li>
+      </ol>
+    </nav>
+
+
+    <!-- Year Filter -->
+<!--    <div class="container mt-2">-->
+<!--      <form method="GET" action="/bisag/admin/admin_yearly_report">-->
+<!--        <label for="date"><b>Enter Date:</b></label>-->
+<!--        <input type="number" id="date" name="year" class="form-control w-25 d-inline-block ml-2"-->
+<!--               th:value="${selectedYear}" placeholder="Enter Year" required>-->
+<!--        <button type="submit" class="btn btn-primary">Filter</button>-->
+<!--      </form>-->
+<!--    </div>-->
+
+  </div>
+
+<!--  <div class="container mt-2">-->
+<!--  <form method="GET" action="/admin/admin_weekly_report">-->
+<!--    <label for="dateFilter"><b>Select Date:</b></label>-->
+<!--    <input type="date" id="dateFilter" name="date" class="form-control w-25 d-inline-block ml-2"-->
+<!--           th:value="${selectedDate}">-->
+<!--    <button type="submit" class="btn btn-primary">Filter</button>-->
+<!--  </form>-->
+<!--</div>-->
+
+  <div class="mt-4">
+    <h4>Reports for the year: <span th:text="${year}"></span></h4>
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Report Id</th>
+        <th>Submitted By</th>
+        <th>Group</th>
+        <th>Report Submitted Date</th>
+        <th>Guide</th>
+
+
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="report : ${reports}">
+        <td th:text="${report.weekNo}">0</td>
+        <td th:text="${report.intern.firstName} + ' ' + ${report.intern.lastName}"></td>
+        <td th:text="${report.group.groupId}"></td>
+        <td th:text="${report.reportSubmittedDate}"></td>
+        <td th:text="${report.group.guide.name}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Include footer -->
+  <div th:replace="fragments/footerFragment :: footer"></div>
+
+</main>
+
+<script>
+  document.getElementById("yearFilter").addEventListener("change", function() {
+    this.form.submit();
+  });
+</script>
+
+</body>
+</html>
+
