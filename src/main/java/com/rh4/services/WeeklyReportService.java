@@ -60,4 +60,11 @@ public class WeeklyReportService {
 				.orElseThrow(() -> new IllegalArgumentException("Report not found for group " + group.getGroupId() + " and weekNo " + weekNo));
 	}
 
+	//	for search report yearwise------------
+
+	public List<WeeklyReport> getReportsByYear(int year) {
+		return weeklyReportRepo.findReportsByYear(year);
+	}
+
+
 }
