@@ -10,17 +10,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
-import com.rh4.models.ProjectDefinition;
 import com.rh4.repositories.*;
-import org.apache.kafka.common.network.Mode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +23,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.server.ResponseStatusException;
@@ -43,9 +33,7 @@ import com.rh4.models.ReportFilter;
 import com.rh4.services.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Path;
-
-import javax.swing.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/bisag/admin")
@@ -89,6 +77,16 @@ public class AdminController {
     private static YearlyReportService yearlyReportService;
     @Autowired
     private WeeklyReportRepo weeklyReportRepo;
+    @Autowired
+    private FeedBackService feedbackService;
+    @Autowired
+    private VerificationService verificationService;
+    @Autowired
+    private LogService logService;
+    @Autowired
+    private AnnoucementService announcementService;
+    @Autowired
+    private AnnouncementRepo announcementRepo;
 
     @Value("${app.storage.base-dir}")
     private String baseDir;
@@ -1544,6 +1542,61 @@ public class AdminController {
 
 
 
+//  ------------------------------------------ view report ----------------------------------------
+
+    @GetMapping("/view_weekly_reports/{weekNo}")
+    public ModelAndView chanegWeeklyReportSubmission(@PathVariable("weekNo") int weekNo) {
+        ModelAndView mv = new ModelAndView("intern/change_weekly_report");
+        Intern inetrn = getSignedInIntern();
+        GroupEntity group = inetrn.getGroup();
+        WeeklyReport report = weeklyReportService.getReportByWeekNoAndGroupId(weekNo, group);
+        MyUser user = myUserService.getUserByUsername(report.getReplacedBy().getUsername());
+        if (user.getRole().equals("GUIDE")) {
+            Guide guide = guideService.getGuideByUsername(user.getUsername());
+            String status = "Your Current Weekly report is required some modifications given by guide. Please check it out.";
+            mv.addObject("status", status);
+            mv.addObject("replacedBy", guide.getName());
+        } else if (user.getRole().equals("INTERN")) {
+            Intern intern = internService.getInternByUsername(user.getUsername());
+            mv.addObject("replacedBy", intern.getFirstName() + " " + intern.getLastName());
+            mv.addObject("status",
+                    "Your current weekly report is accepted and if any changes are required then you will be notified.");
+        }
+        mv.addObject("report", report);
+        mv.addObject("group", group);
+        return mv;
+    }
+
+
+//   ===========================manuallyy create metho===========================================
+
+
+
+    public Intern getSignedInIntern() {
+        String username = (String) session.getAttribute("username");
+        Intern intern = internService.getInternByUsername(username);
+        if (intern.getIsActive()) {
+            return intern;
+        } else {
+            return null;
+        }
+    }
+
+    @GetMapping("/viewPdf/{internId}/{weekNo}")
+    public ResponseEntity<byte[]> viewPdf(@PathVariable String internId, @PathVariable int weekNo) {
+        WeeklyReport report = weeklyReportService.getReportByInternIdAndWeekNo(internId, weekNo);
+        byte[] pdfContent = report.getSubmittedPdf();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+
+        return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
+    }
+
+
+
+
+
 
     @GetMapping("/cancellation_requests")
     public ModelAndView cancellationRequests(Model model) {
@@ -1708,15 +1761,17 @@ public class AdminController {
         adminService.changePassword(admin, newPassword);
         return "redirect:/logout";
     }
-    //-------------------------- View all thesis records-----------------------------------------------------------------------------------------------------------------
-    //--------------------------------------------------------------------------------------------------------------------------------------
-//    @GetMapping("/thesis")
-//    public String viewThesisList(Model model) {
-//        List<Thesis> thesisList = thesisService.getAllTheses();
-//        model.addAttribute("theses", thesisList);
-//        return "thesis_list";
+
+
+//
+//    @GetMapping("/view_weekly_reports/{groupId}/{weekNo}")
+//    public String viewWeeklyReports(@RequestParam("groupId") long groupId, Model model) {
+//        List<WeeklyReport> weeklyReports = weeklyReportService.getReportsByGroupId(groupId);
+//        model.addAttribute("weeklyReports", weeklyReports);
+//        return "admin/view_weekly_reports";
 //    }
 
+    //-------------------------- View all thesis records-----------------------------------------------------------------------------------------------------------------
 
     // Show form to add a new thesis
     @GetMapping("thesis/new")
@@ -1751,6 +1806,7 @@ public class AdminController {
             return "error/404";  // A fallback error page
         }
     }
+
     // Show form to edit an existing thesis
 //    @GetMapping("/thesis/edit/{id}")
 //    public String editThesis(@PathVariable Long id, Model model) {
@@ -1768,19 +1824,6 @@ public class AdminController {
 
 
 //   yearly report controller-------------------------------------
-
-//    @GetMapping("/admin_weekly_report")
-//    public String getReportsByYear(
-//            @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
-//            Model model) {
-//
-//        Map<Integer, List<WeeklyReport>> yearlyReports = weeklyReportService.getReportsBeforeDateGroupedByYear(date);
-//
-//        model.addAttribute("yearlyReports", yearlyReports);
-//        model.addAttribute("selectedDate", date);
-//        return "admin/admin_weekly_report"; // Ensure this matches your Thymeleaf template name
-//    }
-
 
     @GetMapping("/admin_yearly_report")
     public String getReportsByYear(@RequestParam(value = "date", required = true) String selectedDate, Model model) {
@@ -1808,6 +1851,259 @@ public class AdminController {
 
         return "admin/admin_yearly_report";
     }
+
+
+//    retrive details from student feedback ------------------------
+
+        @GetMapping("/feedback_form_list")
+        public String getAdminFeedbackList(Model model) {
+            List<Feedback> feedbacks = feedbackService.getFeedback();
+            model.addAttribute("feedbacks", feedbacks);
+            return "admin/feedback_form_list"; // Create this Thymeleaf template for admin
+        }
+
+
+
+    // ========================== COMPANY VERIFICATION REQUESTS ========================== //
+
+
+
+    //View all pending verification requests
+    @GetMapping("/verification_requests")
+    public ModelAndView viewVerificationRequests(Model model, HttpSession session) {
+        ModelAndView mv = new ModelAndView("admin/verification_requests");
+
+        // Fetch pending verification requests
+        List<Verification> pendingRequests = verificationService.getPendingRequests();
+        mv.addObject("requests", pendingRequests);
+
+        // Integrate the notification count logic
+        model = countNotifications(model);
+
+        Admin admin = getSignedInAdmin();
+        String id = String.valueOf(admin.getAdminId());
+
+        // Log admin action
+        logService.saveLog(id, "Viewed Verification Requests",
+                "Admin " + admin.getName() + " accessed the list of pending verification requests.");
+
+        return mv;
+    }
+
+    // View details of a specific verification request
+    @GetMapping("/verify/{id}")
+    public String viewVerificationDetails(@PathVariable("id") long id, Model model) {
+
+        Optional<Verification> verification = verificationService.getVerificationById(id);
+
+        if (verification.isPresent()) {
+
+            Admin admin = getSignedInAdmin();
+            String adminId = String.valueOf(admin.getAdminId());
+            logService.saveLog(adminId, "Verification Details View",
+                    "Admin " + admin.getName() + " viewed the details of verification request with ID: " + id);
+
+            model.addAttribute("verification", verification.get());
+
+            return "admin/verification_detail";
+        } else {
+            model.addAttribute("errorMessage", "Verification request not found.");
+            return "error/404";
+        }
+    }
+
+    @PostMapping("/approve/{id}")
+    public String approveVerification(@PathVariable("id") long id,
+                                      @RequestParam(value = "remarks", required = false) String remarks,
+                                      RedirectAttributes redirectAttributes) {
+        Optional<Verification> verification = verificationService.getVerificationById(id);
+        if (verification.isPresent()) {
+            Verification v = verification.get();
+
+            Admin admin = getSignedInAdmin();
+            String adminId = String.valueOf(admin.getAdminId());
+
+            verificationService.approveVerification(id, adminId, remarks);
+
+            logService.saveLog(adminId, "Verification Approved",
+                    "Admin " + admin.getName() + " approved the verification request with ID: " + id);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Verification request approved successfully!");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Verification request not found.");
+        }
+
+        return "redirect:/bisag/admin/approved_verifications";
+    }
+
+    @PostMapping("/reject/{id}")
+    public String rejectVerification(@PathVariable("id") long id,
+                                     @RequestParam(value = "remarks", required = false) String remarks,
+                                     RedirectAttributes redirectAttributes) {
+        Optional<Verification> verification = verificationService.getVerificationById(id);
+        if (verification.isPresent()) {
+            Verification v = verification.get();
+
+            Admin admin = getSignedInAdmin();
+            String adminId = String.valueOf(admin.getAdminId());
+
+            verificationService.rejectVerification(id, adminId, remarks);
+
+            logService.saveLog(adminId, "Verification Rejected",
+                    "Admin " + admin.getName() + " rejected the verification request with ID: " + id);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Verification request rejected successfully!");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Verification request not found.");
+        }
+
+        return "redirect:/bisag/admin/rejected_verifications";
+    }
+
+    //Form for companies to submit verification requests
+    @GetMapping("/verification_request_form")
+    public ModelAndView verificationRequestForm() {
+        Admin admin = getSignedInAdmin();
+        String id = String.valueOf(admin.getAdminId());
+
+        logService.saveLog(id, "Viewed Verification Request Form", "Admin " + admin.getName() + " accessed the verification request form.");
+
+        return new ModelAndView("admin/verification_request_form");
+    }
+
+    @GetMapping("/get-intern-details/{internId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> getInternDetails(@PathVariable String internId) {
+        // Fetch intern details from the database
+        Intern intern = internService.getInternById(internId);  // Assuming internId is String (if it is Long, adjust accordingly)
+
+        if (intern != null) {
+            Map<String, String> internDetails = new HashMap<>();
+            internDetails.put("internName", intern.getFirstName()); // Ensure this returns the correct name
+            internDetails.put("internContact", intern.getContactNo()); // Ensure this returns the correct contact
+            return ResponseEntity.ok(internDetails);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+    //Handle company verification request submission
+    @PostMapping("/submit_verification_request")
+    public ModelAndView submitVerificationRequest(
+            @RequestParam String internId,
+            @RequestParam String internName,
+            @RequestParam String internContact,
+            @RequestParam String companyName,
+            @RequestParam String contact,
+            @RequestParam String email) {
+
+        Verification verification = new Verification();
+        verification.setInternId(internId);          // Set Intern ID
+        verification.setInternName(internName);      // Set Intern Name
+        verification.setInternContact(internContact); // Set Intern Contact
+        verification.setCompanyName(companyName);    // Set Company Name
+        verification.setContact(contact);            // Set Company Contact
+        verification.setEmail(email);                // Set Company Email
+
+        // Create the verification request
+        verificationService.createVerificationRequest(verification);
+
+        // Log the action
+        Admin admin = getSignedInAdmin();
+        String id = String.valueOf(admin.getAdminId());
+        logService.saveLog(id, "Submitted Verification Request",
+                "Admin " + admin.getName() + " submitted a verification request for Intern ID: " + internId);
+
+        // Redirect to the verification requests page
+        ModelAndView mv = new ModelAndView("admin/verification_requests");
+        mv.addObject("success", true);
+        mv.addObject("requests", verificationService.getPendingRequests());
+        return mv;
+    }
+
+    // Success page after verification request submission
+    @GetMapping("/verification_success")
+    public ModelAndView verificationSuccess() {
+        Admin admin = getSignedInAdmin();
+        String id = String.valueOf(admin.getAdminId());
+
+        logService.saveLog(id, "Viewed Verification Success Page",
+                "Admin " + admin.getName() + " accessed the verification success page.");
+
+        return new ModelAndView("admin/verification_success");
+    }
+
+    // Display Approved Verifications
+    @GetMapping("/approved_verifications")
+    public String showApprovedVerifications(Model model) {
+        List<Verification> approvedVerifications = verificationService.getApprovedVerifications();
+        model.addAttribute("verifications", approvedVerifications);
+
+        Admin admin = getSignedInAdmin();
+        String id = String.valueOf(admin.getAdminId());
+
+        logService.saveLog(id, "Viewed Approved Verifications",
+                "Admin " + admin.getName() + " viewed the list of approved verifications.");
+
+        return "admin/approved_verifications";
+    }
+
+    // Display Rejected Verifications
+    @GetMapping("/rejected_verifications")
+    public String showRejectedVerifications(Model model) {
+        List<Verification> rejectedVerifications = verificationService.getRejectedVerifications();
+        model.addAttribute("verifications", rejectedVerifications);
+
+        Admin admin = getSignedInAdmin();
+        String id = String.valueOf(admin.getAdminId());
+
+        logService.saveLog(id, "Viewed Rejected Verifications",
+                "Admin " + admin.getName() + " viewed the list of rejected verifications.");
+
+        return "admin/rejected_verifications";
+    }
+
+
+
+// =============================Annoucemnet Board Start=================================================
+
+
+//        @GetMapping("/announcement")
+//        public String getAllAnnouncements(Model model) {
+//        model.addAttribute("announcements", announcementService.getAllAnnouncements());
+//        return "admin/announcement";
+//        }
+
+        @GetMapping("/announcement")
+        public String getAllAnnouncements(Model model) {
+        model.addAttribute("announcements", announcementService.getAllAnnouncements());
+        model.addAttribute("newAnnouncement", new Announcement());
+        return "admin/announcement";
+    }
+
+        @PostMapping("/announcement")
+        public String createAnnouncement(@ModelAttribute Announcement announcement, Model model) {
+            announcementService.createAnnouncement(announcement);
+            return "redirect:/bisag/admin/announcement";
+        }
+
+
+
+
+//    @PostMapping("/announcements/add")
+//    public String addAnnouncement(@RequestParam String title,
+//                                  @RequestParam String description,
+//                                  RedirectAttributes redirectAttributes) {
+//        Announcement announcement = new Announcement(title, description);
+//        announcementService.saveAnnouncement(announcement);
+//        redirectAttributes.addFlashAttribute("message", "Announcement added successfully!");
+//        return "redirect:/announcements";
+
+
+//        @PostMapping()
+//        public Annoucement createAnnoucement(@RequestBody Annoucement announcement) {
+//        return announcementService.createAnnoucement(announcement);
+//        }
+
 }
 
 
