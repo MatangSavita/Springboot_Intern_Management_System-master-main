@@ -1,0 +1,14 @@
+package com.rh4.repositories;
+
+import com.rh4.entities.Feedback;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+
+public interface FeedbackRepo extends JpaRepository<Feedback, Integer> {
+    List<Feedback> findAll();
+}
+
