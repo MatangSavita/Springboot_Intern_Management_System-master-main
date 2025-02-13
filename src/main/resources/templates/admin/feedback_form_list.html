@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Feedback Form List</title>
+
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+  <style>
+    .lgout {
+      padding: 10px;
+      list-style-type: none;
+      border: 2px solid;
+      border-radius: 10px;
+    }
+
+    .container {
+      width: 80%;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin: 0 auto;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+
+    tr:hover {
+      background-color: #f2f2f2;
+    }
+
+    .icon {
+      font-size: 40px;
+      border: solid;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: white;
+    }
+
+    .main {
+      margin-left: 300px; /* Adjust this value to match your sidebar width */
+      padding: 20px;
+    }
+
+    @media (max-width: 1199px) {
+      .main {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Include the header fragment -->
+<div th:replace="fragments/headerFragment :: header"></div>
+
+<!-- Include the aside fragment -->
+<div th:replace="fragments/asideFragment :: aside"></div>
+
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Feedback form List</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">Forms</li>
+        <li class="breadcrumb-item active">Feedback Forms List</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+  <h2>Intern Feedback List</h2>
+  <div class="container mt-2">
+    <table>
+      <thead>
+      <tr>
+        <th><No class=""></No></th>
+        <th>Intern ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Environment</th>
+        <th>Facilities</th>
+        <th>Interaction</th>
+        <th>Materials</th>
+        <th>Response</th>
+        <th>Experience</th>
+        <th>Research Areas</th>
+        <th>Topics</th>
+        <th>Magazine</th>
+        <th>Date</th>
+        <th>Signature</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="feedback : ${feedbacks}">
+        <td th:text="${feedback.id}"></td>
+        <td th:text="${feedback.internId}"></td>
+        <td th:text="${feedback.firstName}"></td>
+        <td th:text="${feedback.lastName}"></td>
+        <td th:text="${feedback.environment}"></td>
+        <td th:text="${feedback.facilities}"></td>
+        <td th:text="${feedback.interaction}"></td>
+        <td th:text="${feedback.materials}"></td>
+        <td th:text="${feedback.response}"></td>
+        <td th:text="${feedback.experience}"></td>
+        <td th:text="${feedback.researchAreas}"></td>
+        <td th:text="${feedback.topics}"></td>
+        <td th:text="${feedback.magazine}"></td>
+        <td th:text="${feedback.feedbackDate}"></td>
+        <td th:text="${feedback.studentSign}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Include the footer fragment -->
+  <div th:replace="fragments/footerFragment :: footer"></div>
+
+</main>
+<!-- End #main -->
+
+<!-- Bootstrap and jQuery Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"
+        integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
