@@ -4,16 +4,17 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import com.rh4.entities.*;
+import com.rh4.repositories.AnnouncementRepo;
+import com.rh4.repositories.FeedbackRepo;
+import com.rh4.repositories.InternRepo;
+import com.rh4.services.*;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,31 +25,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.rh4.entities.Admin;
-import com.rh4.entities.GroupEntity;
-import com.rh4.entities.Guide;
-import com.rh4.entities.Intern;
-import com.rh4.entities.InternApplication;
-import com.rh4.entities.MyUser;
-import com.rh4.entities.WeeklyReport;
-import com.rh4.models.ProjectDefinition;
 import com.rh4.repositories.GroupRepo;
-import com.rh4.services.AdminService;
-import com.rh4.services.GuideService;
-import com.rh4.services.InternService;
-import com.rh4.services.MyUserService;
-import com.rh4.services.WeeklyReportService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -76,8 +63,19 @@ public class InternController {
     HttpSession session;
     @Autowired
     GroupRepo groupRepo;
+    @Autowired
+    InternRepo internRepo;
+    @Autowired
+    private AnnoucementService announcementService;
+    @Autowired
+    private AnnouncementRepo announcementRepo;
+
     boolean WEEKLYREPORTDISABLE;
     int CurrentWeekNo;
+    @Autowired
+    private FeedBackService feedBackService;
+    @Autowired
+    private FeedbackRepo feedbackRepo;
 
     public Intern getSignedInIntern() {
         String username = (String) session.getAttribute("username");
@@ -631,14 +629,15 @@ public class InternController {
 
             byte[] image = application.getPassportSizeImage();
 
-            if (image != null) {
+            if(image != null) {
                 return ResponseEntity.ok()
                         .contentType(MediaType.IMAGE_JPEG)
                         .body(image);
             } else {
                 return ResponseEntity.notFound().build();
             }
-        } else {
+            } else
+        {
             return ResponseEntity.notFound().build();
         }
     }
@@ -731,5 +730,119 @@ public class InternController {
             return "redirect:/bisag/intern/intern_dashboard";
         }
     }
+
+// ///////////   Feedback form for student -------------------- ///////////
+//
+
+   //     @GetMapping("/feedback_form")
+    //    public String showFeedbackForm(Model model) {
+      //      model.addAttribute("feedback", new Feedback());
+        //    return "intern/feedback_form";
+        //}
+
+
+    //    @PostMapping("/feedback_form")
+    //    public String submitFeedback(@ModelAttribute Feedback feedback) {
+    //        feedBackService.saveFeedback(feedback);
+    //        return "redirect:/bisag/intern/intern_dashboard";
+//            return "admin/feedback_form_list";
+     //   }
+
+    @GetMapping("/feedback_form")
+    public String showFeedbackForm(Model model) {
+        Intern currentIntern = getSignedInIntern();
+
+        // Create a list with just the current intern
+        List<Intern> internList = new ArrayList<>();
+        internList.add(currentIntern);
+
+        // Create new feedback object and set intern details
+        Feedback feedback = new Feedback();
+        feedback.setInternId(currentIntern.getInternId());
+        feedback.setFirstName(currentIntern.getFirstName());  // Set firstName
+        feedback.setLastName(currentIntern.getLastName());    // Set lastName
+
+        model.addAttribute("interns", internList);
+        model.addAttribute("feedback", feedback);
+        return "intern/feedback_form";
+    }
+
+    @PostMapping("/feedback_form")
+    public String submitFeedback(@ModelAttribute Feedback feedback) {
+        try {
+            Intern currentIntern = getSignedInIntern();
+            System.out.println("Current Intern ID: " + currentIntern.getInternId());
+            System.out.println("Current Intern First Name: " + currentIntern.getFirstName());
+            System.out.println("Current Intern Last Name: " + currentIntern.getLastName());
+
+            feedback.setInternId(currentIntern.getInternId());
+            feedback.setFirstName(currentIntern.getFirstName());  // Set firstName
+            feedback.setLastName(currentIntern.getLastName());    // Set lastName
+
+            feedBackService.saveFeedback(feedback);
+            return "redirect:/bisag/intern/intern_dashboard";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/bisag/intern/feedback_form?error=true";
+        }
+    }
+
+
+
+
+//    @GetMapping("/announcement")
+//    public String getAllAnnouncements(Model model) {
+//        List<Announcement> announcements = announcementService.getAllAnnouncements();
+//        model.addAttribute("announcements", announcements);
+////        model.addAttribute("newAnnouncement", new Announcement());
+//        return "admin/announcement";
+//    }
+
+@GetMapping("/announcementList")
+public String showDashboard(Model model) {
+    RestTemplate restTemplate = new RestTemplate();
+    String adminUrl = "http://localhost:8081/bisag/admin/announcement"; // Ensure this URL is correct
+
+    try {
+        ResponseEntity<Announcement[]> response = restTemplate.getForEntity(adminUrl, Announcement[].class);
+        List<Announcement> announcements = Arrays.asList(response.getBody());
+        model.addAttribute("announcements", announcements);
+    } catch (Exception e) {
+        model.addAttribute("announcements", List.of()); // Handle errors gracefully
+    }
+
+    return "intern/intern_dashboard";
+}
+
+
+
+//
+//    @GetMapping("/announcement")
+//    public String showInternDashboard(Model model) {
+//
+//    List<Announcement> announcements = announcementService.getInternAnnouncements();
+//    model.addAttribute("announcements", announcements);
+////    model.addAttribute("announcements", announcementService.getInternAnnouncements());
+//    return "intern/intern_dashboard"; // Returns the intern dashboard
+//}
+
+
+//    @GetMapping("/announcement")
+//    public String showInternDashboard(Model model) {
+//        List<Announcement> announcements = announcementService.getInternAnnouncements();
+//        model.addAttribute("announcements", announcements);
+//        try {
+//            Announcement  announcement = new Announcement();
+//            System.out.println("Current Intern ID: " + announcement.getTitle());
+//            System.out.println("Current Intern First Name: " + announcement.getContent());
+//            System.out.println("Current Intern Last Name: " + announcement.getCreatedAt().toString() );
+//
+//            announcementService.getAllAnnouncements();
+//            return "redirect:/bisag/intern/intern_dashboard";
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return "redirect:/bisag/intern/feedback_form?error=true";
+//        }
+//    }
 
 }
