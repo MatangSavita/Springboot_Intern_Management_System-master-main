@@ -26,6 +26,7 @@ public class InternService {
 	@Autowired
 	private MyUserService myUserService;
 
+
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -184,5 +185,17 @@ public class InternService {
 		Intern intern = internRepo.findById(id).orElseThrow(() -> new RuntimeException("Image not found"));
 		return intern.getProfilePicture();
 	}
+
+
+	public Intern getInternById(String internId) {
+		return internRepo.findById(internId)
+				.orElseThrow(() -> new RuntimeException("Intern not found with ID: " + internId));
+	}
+
+
+
+//		public List<Intern> getAllInterns() {
+//			return internRepo.findAll();
+//		}
 
 }

@@ -24,6 +24,10 @@ public class AdminService {
 	private UserRepo userRepo;
 	@Autowired
 	private MyUserService myUserService;
+	@Autowired
+	private FileService fileService;
+	@Autowired
+	private FeedbackRepo feedbackRepo;
 
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -123,5 +127,9 @@ public class AdminService {
 			internService.updateCancellationStatus(intern);
 		}
 	}
+
+		public List<Feedback> getFeedback() {
+			return feedbackRepo.findAll();
+		}
 
 }

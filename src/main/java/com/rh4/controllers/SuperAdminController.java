@@ -3,17 +3,15 @@ package com.rh4.controllers;
 import java.util.List;
 import java.util.Optional;
 
+import com.rh4.repositories.ContactRepo;
+import com.rh4.services.ContactFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.rh4.entities.Admin;
@@ -25,6 +23,7 @@ import com.rh4.services.EmailSenderService;
 import com.rh4.services.SuperAdminService;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 @Controller
@@ -38,6 +37,11 @@ public class SuperAdminController {
 	private AdminService adminService;
 	@Autowired
 	private SuperAdminService superAdminService;
+	@Autowired
+	private ContactFormService contactFormService;
+	@Autowired
+	private ContactRepo contactRepo;
+
 	private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public static String encodePassword(String rawPassword) {
@@ -182,5 +186,42 @@ public class SuperAdminController {
     }
 	
 	//--------------------------------- Admin Delete Completed -------------------------------------//
-    
+//
+//	@GetMapping("/contact-form")
+//	public ModelAndView handleSubmit(
+//			@RequestParam("name") String name,
+//			@RequestParam("email") String email,
+//			@RequestParam("subject") String subject,
+//			@RequestParam("message") String message) {
+//
+//		// Process the form data (e.g., save to database, send email, etc.)
+//
+//		// Redirect to the same page with a success message
+//		ModelAndView modelAndView = new ModelAndView("contact");
+//		modelAndView.addObject("successMessage", "Your message has been sent. Thank you!");
+//		return modelAndView;
+//	}
+
+	@PostMapping("/contact")
+	public String submitContactForm(@RequestParam String name,
+									@RequestParam String email,
+									@RequestParam String subject,
+									@RequestParam String message,
+									RedirectAttributes redirectAttributes) {
+		// Save the contact form submission to the database
+		contactFormService.saveContactForm(name, email, subject, message);
+
+		// Add success message
+		redirectAttributes.addFlashAttribute("successMessage", "Your message has been sent successfully!");
+
+		// Redirect to the same page
+		return "redirect:/bisag/super_admin/contact";
+	}
+
+	@GetMapping("/contact")
+	public String showIndexPage() {
+		return "/super_admin/contact";  // Returns index.html page
+	}
+
+
 }

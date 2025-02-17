@@ -1,5 +1,6 @@
 package com.rh4.entities;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import jakarta.persistence.*;
@@ -8,40 +9,41 @@ import jakarta.persistence.*;
 @Table(name = "weekly_report")
 public class WeeklyReport {
 	
-	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "weekly_report")
-	private long weeklyReportId;
-	
-	@JoinColumn(name = "intern_id")
-	@ManyToOne
-	private Intern intern;
-	
-	@JoinColumn(name = "group_id")
-	@ManyToOne
-	private GroupEntity group;
-	
-	private Date reportSubmittedDate;
-	private Date deadline;
-	
-	private int weekNo;
+		@Id
+		@GeneratedValue(strategy = GenerationType.IDENTITY)
+		@Column(name = "weekly_report")
+		private long weeklyReportId;
 
-	@Lob
-	@Column(name = "submitted_pdf", columnDefinition = "LONGBLOB")
-    private byte[] submittedPdf;
-	
-	@JoinColumn(name = "guide_id")
-	@ManyToOne
-	private Guide guide;
-	
-	@ManyToOne
-	private MyUser replacedBy;
-	
-	private String status;
+		@JoinColumn(name = "intern_id")
+		@ManyToOne
+		private Intern intern;
 
-	public WeeklyReport() {
-		super();
-	}
+		@JoinColumn(name = "group_id")
+		@ManyToOne
+		private GroupEntity group;
+
+		private Date reportSubmittedDate;
+		private Date deadline;
+
+		private int weekNo;
+
+		@Lob
+		@Column(name = "submitted_pdf", columnDefinition = "LONGBLOB")
+		private byte[] submittedPdf;
+
+
+		@JoinColumn(name = "guide_id")
+		@ManyToOne
+		private Guide guide;
+
+		@ManyToOne
+		private MyUser replacedBy;
+
+		private String status;
+
+		public WeeklyReport() {
+			super();
+		}
 
 	public WeeklyReport(long weeklyReportId, Intern intern, GroupEntity group, Date reportSubmittedDate, Date deadline,
 			int weekNo, byte[] submittedPdf, Guide guide, MyUser replacedBy, String status) {
@@ -138,5 +140,14 @@ public class WeeklyReport {
 		this.status = status;
 	}
 
+//		public  int getYear(){
+//			Calendar calendar = Calendar.getInstance();
+//			calendar.setTime(this.reportSubmittedDate);
+//			return calendar.get(Calendar.YEAR);
+//		}
+
+//		public int getYear() {
+//			return this.reportSubmittedDate.getYear();
+//		}
 	
 }

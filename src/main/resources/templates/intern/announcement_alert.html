@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Announcement</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <style>
+
+
+
+/*        .lgout {*/
+/*            padding: 10px;*/
+/*            list-style-type: none;*/
+/*            border: 2px solid;*/
+/*            border-radius: 10px;*/
+/*        }*/
+/*        !* Announcement Board Container *!*/
+/*        .announcement-board {*/
+/*            width: 90%;*/
+/*            max-width: 800px;*/
+/*            margin: 20px auto;*/
+/*            padding: 20px;*/
+/*            background: #f8f9fa;*/
+/*            border-radius: 12px;*/
+/*            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);*/
+/*            text-align: center;*/
+/*        }*/
+
+/*        !* Board Title *!*/
+/*        .board-title {*/
+/*            font-size: 24px;*/
+/*            font-weight: bold;*/
+/*            color: #2c3e50;*/
+/*            margin-bottom: 15px;*/
+/*        }*/
+
+/*        !* Individual Announcement Card *!*/
+/*        .announcement-card {*/
+/*            background: #fffaf3;*/
+/*            padding: 15px;*/
+/*            border-left: 5px solid #ff9800;*/
+/*            border-radius: 8px;*/
+/*            margin-bottom: 15px;*/
+/*            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
+/*            text-align: left;*/
+/*        }*/
+
+/*        !* Announcement Title *!*/
+/*        .announcement-title {*/
+/*            font-size: 18px;*/
+/*            font-weight: bold;*/
+/*            color: #d35400;*/
+/*        }*/
+
+/*        !* Announcement Content *!*/
+/*        .announcement-content {*/
+/*            font-size: 16px;*/
+/*            color: #2c3e50;*/
+/*            margin: 5px 0;*/
+/*        }*/
+
+/*        !* Date Styling *!*/
+/*        .announcement-date {*/
+/*            font-size: 14px;*/
+/*            color: #7f8c8d;*/
+/*            display: block;*/
+/*            margin-top: 5px;*/
+/*            text-align: right;*/
+/*        }*/
+
+/* Announcement Board Container */
+.announcement-board {
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Board Title */
+.board-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+/* Individual Announcement Card */
+.announcement-card {
+    background: #fffaf3;
+    padding: 15px;
+    border-left: 5px solid #ff9800;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+/* Announcement Title */
+.announcement-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #d35400;
+}
+
+/* Announcement Content */
+.announcement-content {
+    font-size: 16px;
+    color: #2c3e50;
+    margin: 5px 0;
+}
+
+/* Date Styling */
+.announcement-date {
+    font-size: 14px;
+    color: #7f8c8d;
+    display: block;
+    margin-top: 5px;
+    text-align: right;
+}
+
+    </style>
+</head>
+
+<body>
+
+
+<!-- Include the header fragment -->
+<div th:replace="fragments/internHeaderFragment :: header"></div>
+
+<!-- Include the aside fragment -->
+<div th:replace="fragments/internAsideFragment :: aside"></div>
+
+
+
+
+<main id="main" class="main">
+    <div class="announcement-board">
+        <h2 class="board-title">📢 Announcements</h2>
+        <div th:each="announcement : ${announcements}" class="announcement-card">
+            <h3 class="announcement-title" th:text="${announcement.title}"></h3>
+            <p class="announcement-content" th:text="${announcement.content}"></p>
+            <span class="announcement-date" th:text="${announcement.createdAt}"></span>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#notificationBadge").hide();  // Hide notification
+        });
+    </script>
+</main>
+
+
+
+
+</body>
+
+</html>

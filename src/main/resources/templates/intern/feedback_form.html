@@ -292,9 +292,17 @@
                         <label>Student Sign:</label>
                         <input type="text" class="input-field" th:field="*{studentSign}" name="signature" required>
 
+<!--                        <div>-->
+<!--                            <label>Message:</label>-->
+<!--                            <textarea th:field="*{message}"></textarea>-->
+<!--                        </div>-->
+
                         <button type="submit">Submit</button>
                     </div>
                 </form>
+                <div th:if="${message}">
+                    <p th:text="${message}"></p>
+                </div>
             </div>
         </div>
     </div>

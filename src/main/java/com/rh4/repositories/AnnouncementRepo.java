@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface AnnouncementRepo extends JpaRepository<Announcement, Integer> {
     List<Announcement> findByType(String type);
+
+    Announcement findById(int announcementId);
 }

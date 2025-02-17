@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Subject</th>
+        <th>Message</th>
+        <th>Submitted At</th>
+    </tr>
+    <tr th:each="msg : ${messages}">
+        <td th:text="${msg.name}"></td>
+        <td th:text="${msg.email}"></td>
+        <td th:text="${msg.subject}"></td>
+        <td th:text="${msg.message}"></td>
+        <td th:text="${msg.submittedAt}"></td>
+    </tr>
+</table>
+
+
+</body>
+</html>

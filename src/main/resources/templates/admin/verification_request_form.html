@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Intern Verification Request</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa0Yz1rzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+          crossorigin="anonymous">
+
+    <style>
+        .form-floating {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .breadcrumb-item a {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Include the header fragment -->
+<div th:replace="fragments/headerFragment :: header"></div>
+
+<!-- Include the aside fragment -->
+<div th:replace="fragments/asideFragment :: aside"></div>
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Intern Verification Request</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/bisag/admin/verification_requests}">Verification</a></li>
+                <li class="breadcrumb-item active">Submit Verification Request</li>
+            </ol>
+        </nav>
+    </div>
+    <!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Enter Details</h5>
+
+                        <!-- Floating Labels Form -->
+                        <form th:action="@{/bisag/admin/submit_verification_request}" method="post">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="internId" class="form-control" id="internId"
+                                               placeholder="Intern ID" required onkeyup="fetchInternDetails()">
+                                        <label for="internId">Intern ID</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="internName" class="form-control" id="internName" placeholder="Intern Name" readonly>
+                                        <label for="internName">Intern Name:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="internContact" class="form-control" id="internContact" placeholder="Intern Contact" readonly>
+                                        <label for="internContact">Intern Contact:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="companyName" class="form-control" id="companyName"
+                                               placeholder="Company Name" required>
+                                        <label for="companyName">Company Name</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="contact" class="form-control" id="contact"
+                                               placeholder="Contact Number" required>
+                                        <label for="contact">Company Contact Number</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="email" name="email" class="form-control" id="email"
+                                               placeholder="Company Email" required>
+                                        <label for="email">Company Email</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary">
+            <span class="spinner-border spinner-border-sm visually-hidden"
+                  role="status" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Loading...</span>Submit
+                                </button>
+                            </div>
+                        </form>
+
+                        <script>
+                            function fetchInternDetails() {
+                                let internId = document.getElementById('internId').value; // Get intern ID from the input field
+
+                                // Only proceed if an internId is provided
+                                if (internId) {
+                                    fetch(`/bisag/admin/get-intern-details/${internId}`)  // Make sure the URL is correct
+                                        .then(response => response.json())  // Parse the JSON response
+                                        .then(data => {
+                                            if (data) {
+                                                document.getElementById('internName').value = data.internName || ''; // Fill the intern name field
+                                                document.getElementById('internContact').value = data.internContact || ''; // Fill the contact field
+                                            } else {
+                                                // Clear fields if no data is returned
+                                                document.getElementById('internName').value = '';
+                                                document.getElementById('internContact').value = '';
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error fetching intern details:', error); // Log any error
+                                        });
+                                }
+                            }
+                        </script>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Include the footer fragment -->
+    <div th:replace="fragments/footerFragment :: footer"></div>
+</main>
+<!-- End #main -->
+
+</body>
+
+</html>
