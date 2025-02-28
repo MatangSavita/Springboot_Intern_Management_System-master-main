@@ -14,5 +14,5 @@ public interface AdminRepo extends JpaRepository<Admin, Long> {
 	Admin findTopByOrderByAdminIdDesc();
 
 	Admin findByEmailId(String username);
- 
+
 }

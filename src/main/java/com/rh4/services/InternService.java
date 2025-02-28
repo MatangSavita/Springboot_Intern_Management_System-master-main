@@ -7,7 +7,12 @@ import org.springframework.stereotype.Service;
 
 import com.rh4.entities.*;
 import com.rh4.repositories.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.util.*;
 @Service
@@ -26,20 +31,19 @@ public class InternService {
 	@Autowired
 	private MyUserService myUserService;
 
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-	
 	public void registerIntern(Intern intern)
 	{
 		internRepo.save(intern);
 	}
-	
+
 	public String getMostRecentInternId()
 	{
 		Intern mostRecentIntern = internRepo.findTopByOrderByInternIdDesc();
-        return mostRecentIntern != null ? mostRecentIntern.getInternId() : null;
+		return mostRecentIntern != null ? mostRecentIntern.getInternId() : null;
 	}
 	public List<InternApplication> getInternApplication()
 	{
@@ -61,17 +65,36 @@ public class InternService {
 	}
 	public List<InternApplication> getApprovedInterns()
 	{
+
 		return internApplicationRepo.getInternApprovedStatus();
 	}
+
+	// Update the return type to List<InternApplication> or another appropriate entity
+//	public List<InternApplication> getRejectedInterns() {
+//		return internRepo.getInternRejectedStatus(); // Fetch rejected interns
+//	}
 	public List<Intern> getInterns()
 	{
 		return internRepo.findAll();
 	}
+
+	//it will fetch the intern IDs
+	public List<Intern> getAllInterns() {
+		List<Intern> interns = internRepo.findAll();
+		System.out.println("Fetched interns: " + interns.size()); // Print size to verify data
+		return interns;
+	}
+
+//	// Fetch distinct project definitions from the Intern table
+//	public List<String> getDistinctProjectDefinitions() {
+//		return internRepo.findDistinctProjectDefinitionNames(); // Custom query to fetch distinct values
+//	}
+
 	public void addIntern(Intern intern)
 	{
 		String encryptedPassword = passwordEncoder().encode(intern.getPassword());
 		intern.setPassword(encryptedPassword);
-		internRepo.save(intern);		
+		internRepo.save(intern);
 		//save to user table
 		String email = intern.getEmail();
 		String role = "UNDERPROCESSINTERN";
@@ -89,19 +112,19 @@ public class InternService {
 	}
 
 	public void updateCancellationStatus(Intern intern) {
-        internRepo.save(intern);
-    }
-	
+		internRepo.save(intern);
+	}
+
 	public long approveForInterviewApplicationsCount() {
-        return internApplicationRepo.countByStatus("pending");
-    }
+		return internApplicationRepo.countByStatus("pending");
+	}
 	public long countPendingInterviewApplications() {
 		return internApplicationRepo.countPendingInterviewApplications();
-        //return internApplicationRepo.countByFinalStatus("pending");
-    }
+		//return internApplicationRepo.countByFinalStatus("pending");
+	}
 	public long countInterns() {
-        return internRepo.count();
-    }
+		return internRepo.count();
+	}
 
 	public Optional<Intern> getIntern(String id) {
 		return internRepo.findById(id);
@@ -116,37 +139,44 @@ public class InternService {
 	}
 
 	public void cancelInternApplication(Optional<InternApplication> intern) {
-		
+
 		intern.get().setIsActive(false);
 		cancelled.setCancelId(Long.toString(intern.get().getId()));
 		cancelled.setTableName("internapplication");
 		cancelledRepo.save(cancelled);
-		
+
 	}
-	public List<Intern> getInternsByGroupId(long groupId) {
+	public List<Intern> getInternsByGroupId(Long groupId) {
 		return internRepo.findByGroupId(groupId);
 	}
-	
+
 	public List<Intern> getInternsByCancellationStatus(String cancellationStatus) {
-        return internRepo.findByCancellationStatus(cancellationStatus);
-    }
-	
-	public long countRequestedCancellations() {
-	    return internRepo.countByCancellationStatus("requested");
+		return internRepo.findByCancellationStatus(cancellationStatus);
 	}
+
+	public long countRequestedCancellations() {
+		return internRepo.countByCancellationStatus("requested");
+	}
+
+//	public List<Intern> getCancelledInterns() {
+//		return internRepo.getCancelledIntern();
+//	}
 
 	public List<Intern> getCancelledInterns() {
-		return internRepo.getCancelledIntern();
+		return internRepo.findByCancellationStatus("Cancelled");
 	}
-
 	public List<Intern> getCurrentInterns() {
 		return internRepo.getCurrentInterns();
 	}
+//
+//	public List<String> getDistinctGenders() {
+//		return internRepo.findDistinctGenders();
+//	}
 
 	public List<Intern> getFilteredInterns(String college, String branch, Optional<Guide> guide, String domain,
-			String cancelled, Date startDate, Date endDate, String cancelledStatus) {
+										   String cancelled, Date startDate, Date endDate, String cancelledStatus) {
 		if(cancelledStatus.equals("current"))
-		{			
+		{
 			boolean isCancelled = true;
 			return internRepo.getFilteredInterns(college,branch,guide,domain,startDate,endDate,isCancelled);
 		}
@@ -161,6 +191,9 @@ public class InternService {
 		}
 	}
 
+	public Intern getInternById(String id) {
+		return internRepo.findById(id).orElse(null);
+	}
 	public long pendingGroupCreationCount() {
 		return internApplicationRepo.countByGroupCreated();
 	}
@@ -186,16 +219,29 @@ public class InternService {
 		return intern.getProfilePicture();
 	}
 
-
-	public Intern getInternById(String internId) {
-		return internRepo.findById(internId)
-				.orElseThrow(() -> new RuntimeException("Intern not found with ID: " + internId));
+	public Optional<Intern> findById(String internId) {
+		return internRepo.findById(internId);
 	}
 
+	public String saveFile(MultipartFile file) {
+		try {
+			String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+			Path filePath = Paths.get("uploads/" + fileName);
+			Files.write(filePath, file.getBytes());
+			return fileName;
+		} catch (IOException e) {
+			throw new RuntimeException("⚠️ Error saving file", e);
+		}
+	}
 
+	public String getInternNameById(Long internId) {
+		return internRepo.findById(String.valueOf(internId))
+				.map(Intern::getFirstName)
+				.orElse("Intern Not Found");
+	}
 
-//		public List<Intern> getAllInterns() {
-//			return internRepo.findAll();
-//		}
+//	public Intern getInternByName(String internName) {
+//		return internRepo.findByFirstName(internName);
+//	}
 
 }

@@ -19,9 +19,11 @@ public class InternApplication {
     private long id;
 
     @Column(name = "first_name")
+    @NotBlank(message = "First name is required.")
     private String firstName;
 
     @Column(name = "last_name")
+    @NotBlank(message = "Last name is required.")
     private String lastName;
 
     @Column(name = "contact_number", unique = true)
@@ -29,9 +31,12 @@ public class InternApplication {
     private String contactNo;
 
     @Column(name = "email_id", unique = true)
+    @NotBlank(message = "Email is required.")
+    @Email(message = "Invalid email format.")
     private String email;
 
     @Column(name = "college_name")
+    @NotBlank(message = "College name is required.")
     private String collegeName;
 
     @Column(name = "branch_name")
@@ -54,7 +59,7 @@ public class InternApplication {
     private byte[] resumePdf;
 
     @Column(name = "semester")
-    @Min(value = 1, message = "Semester must be at least 1.\r\n")
+    @Min(value = 1, message = "Semester must be at least 1.")
     @Max(value = 8, message = "Semester must be at most 8")
     private int semester;
 
@@ -79,7 +84,7 @@ public class InternApplication {
     private Date joiningDate;
 
     @Column(name = "completion_date")
-    @Future(message = "Completion date must be in the future \r\n")
+    @Future(message = "Completion date must be in the future ")
     private Date completionDate;
 
     @AssertTrue(message = "Completion date must be after joining date \r\n")
@@ -104,8 +109,8 @@ public class InternApplication {
         createdAt = LocalDateTime.now();
     }
 
-	public long getId() {
-		// TODO Auto-generated method stub
-		return id;
-	}
+    public long getId() {
+        // TODO Auto-generated method stub
+        return id;
+    }
 }

@@ -63,13 +63,19 @@
 				</a>
 					<ul id="weekly-report-nav" class="nav-content collapse"
 						data-bs-parent="#weekly-report-nav">
-						<li><a th:href="@{/bisag/guide/weekly_report}"> <i
+						<li><a th:href="@{/bisag/guide/weekly_report}">
+							<i
 								class="bi bi-circle"></i><span>Weekly Reports</span>
-						</a></li>
-						<li><a th:href="@{/bisag/guide/guide_pending_final_reports}"> <i
+						</a>
+						</li>
+						<li><a th:href="@{/bisag/guide/guide_pending_final_reports}">
+							<i
 								class="bi bi-circle"></i><span>Final Reports</span>
 						</a></li>
-					</ul></li>
+
+
+					</ul>
+				</li>
 			</ul>
 
 			<ul class="sidebar-nav" id="def-nav">
@@ -83,7 +89,13 @@
 						<li><a th:href="@{/bisag/guide/guide_pending_def_approvals}">
 								<i class="bi bi-circle"></i><span>Pending Definitions</span>
 						</a></li>
-					</ul></li>
+						<li><a th:href="@{/bisag/guide/create_project_def}">
+							<i class="bi bi-circle"></i><span>Update Definition</span>
+						</a></li>
+					</ul>
+				</li>
+
+
 			</ul> <!-- Vendor JS Files --> <script
 				th:src="@{/assets/vendor/apexcharts/apexcharts.min.js}"></script> <script
 				th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>

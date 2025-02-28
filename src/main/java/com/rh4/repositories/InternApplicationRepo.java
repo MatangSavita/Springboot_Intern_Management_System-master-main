@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.rh4.entities.*;
 @Repository
-public interface InternApplicationRepo extends JpaRepository<InternApplication,Long> 
+public interface InternApplicationRepo extends JpaRepository<InternApplication,Long>
 {
 	@Query("from InternApplication where status='approved'")
 	public List<InternApplication> getInternApprovedStatus();

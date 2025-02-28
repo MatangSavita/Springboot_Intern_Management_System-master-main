@@ -122,9 +122,15 @@
 														data-toggle="dropdown" role="button" aria-haspopup="true"
 														aria-expanded="false"></i>
 													<div class="dropdown-menu">
+<!--														<a-->
+<!--															th:href="@{'/files/weekly_reports/' + ${group.groupId} + '/' + ${report.submittedPdf}}"-->
+<!--															target="_blank" class="dropdown-item">View Report</a> -->
+														<a th:href="@{/bisag/guide/viewPdf/{internId}/{weekNo}(internId=${report.intern.internId}, weekNo=${report.weekNo})}"
+														   target="_blank"
+														   class="dropdown-item">
+															View Report
+														</a>
 														<a
-															th:href="@{'/files/weekly_reports/' + ${group.groupId} + '/' + ${report.submittedPdf}}"
-															target="_blank" class="dropdown-item">View Report</a> <a
 															th:href="@{'/bisag/guide/guide_weekly_report_details/' + ${group.groupId} + '/' + ${report.weekNo}}"
 															class="dropdown-item">Details</a>
 													</div>

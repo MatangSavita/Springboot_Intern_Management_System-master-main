@@ -39,6 +39,8 @@ import com.rh4.repositories.GroupRepo;
 
 import jakarta.servlet.http.HttpSession;
 
+import javax.swing.*;
+
 @Controller
 @RequestMapping("/bisag/intern")
 public class InternController {
@@ -241,33 +243,59 @@ public class InternController {
 
     }
 
+//    @PostMapping("/project_definition_submission")
+//    public String approveProjectDefinition(@RequestParam("projectDefinition") String projectDefinition,
+//                                           @RequestParam("description") String description,
+//                                           @RequestParam("projectDefinitionDocument") MultipartFile projectDefinitionDocument
+//    )
+//            throws Exception {
+//        Intern intern = getSignedInIntern();
+//        GroupEntity group = intern.getGroup();
+//
+//        String storageDir = baseDir2 + group.getGroupId() + "/";
+//        File directory = new File(storageDir);
+//
+//        if (!directory.exists()) {
+//            directory.mkdirs();
+//        }
+//
+//        String projectDefinitionDocumentFileName = storageDir + "projectDefinitionDocument.pdf";
+//
+//        Files.write(Paths.get(projectDefinitionDocumentFileName), projectDefinitionDocument.getBytes());
+//
+//        group.setProjectDefinition(projectDefinition);
+//        group.setDescription(description);
+//        group.setProjectDefinitionDocument(projectDefinitionDocument.getBytes());
+//        group.setProjectDefinitionStatus("gpending");
+//        groupRepo.save(group);
+//        return "redirect:/bisag/intern/project_definition";
+//    }
+
     @PostMapping("/project_definition_submission")
     public String approveProjectDefinition(@RequestParam("projectDefinition") String projectDefinition,
                                            @RequestParam("description") String description,
                                            @RequestParam("projectDefinitionDocument") MultipartFile projectDefinitionDocument
-    )
-            throws Exception {
+    ) throws Exception {
         Intern intern = getSignedInIntern();
         GroupEntity group = intern.getGroup();
 
-        String storageDir = baseDir2 + group.getGroupId() + "/";
-        File directory = new File(storageDir);
-
-        if (!directory.exists()) {
-            directory.mkdirs();
+        // ✅ Check if intern has an assigned group
+        if (group == null) {
+            throw new RuntimeException("Intern is not assigned to any group.");
         }
 
-        String projectDefinitionDocumentFileName = storageDir + "projectDefinitionDocument.pdf";
-
-        Files.write(Paths.get(projectDefinitionDocumentFileName), projectDefinitionDocument.getBytes());
-
+        // ✅ Store only in the database, no need to save on disk
         group.setProjectDefinition(projectDefinition);
         group.setDescription(description);
-        group.setProjectDefinitionDocument(projectDefinitionDocument.getBytes());
+        group.setProjectDefinitionDocument(projectDefinitionDocument.getBytes()); // Store as byte[]
         group.setProjectDefinitionStatus("gpending");
-        groupRepo.save(group);
+
+        groupRepo.save(group); // ✅ Save changes to DB
+
         return "redirect:/bisag/intern/project_definition";
     }
+
+
 
     @GetMapping("/weekly_report_submission")
     public ModelAndView weeklyReportSubmission() {
@@ -552,7 +580,9 @@ public class InternController {
             } else {
                 return ResponseEntity.notFound().build();
             }
-        } else {
+        }
+        else
+        {
             return ResponseEntity.notFound().build();
         }
     }
@@ -790,59 +820,28 @@ public class InternController {
 
 
 
-//    @GetMapping("/announcement")
-//    public String getAllAnnouncements(Model model) {
-//        List<Announcement> announcements = announcementService.getAllAnnouncements();
-//        model.addAttribute("announcements", announcements);
-////        model.addAttribute("newAnnouncement", new Announcement());
-//        return "admin/announcement";
-//    }
-
-@GetMapping("/announcementList")
-public String showDashboard(Model model) {
-    RestTemplate restTemplate = new RestTemplate();
-    String adminUrl = "http://localhost:8081/bisag/admin/announcement"; // Ensure this URL is correct
-
-    try {
-        ResponseEntity<Announcement[]> response = restTemplate.getForEntity(adminUrl, Announcement[].class);
-        List<Announcement> announcements = Arrays.asList(response.getBody());
+    @GetMapping("/announcement_alert")
+    public String getAllAnnouncements(Model model) {
+        List<Announcement> announcements = announcementService.getAllAnnouncements();
         model.addAttribute("announcements", announcements);
-    } catch (Exception e) {
-        model.addAttribute("announcements", List.of()); // Handle errors gracefully
+//        model.addAttribute("newAnnouncement", new Announcement());
+        return "intern/announcement_alert";
     }
 
-    return "intern/intern_dashboard";
-}
-
-
-
+//@GetMapping("/announcementList")
+//public String showDashboard(Model model) {
+//    RestTemplate restTemplate = new RestTemplate();
+//    String adminUrl = "http://localhost:8081/bisag/admin/announcement"; // Ensure this URL is correct
 //
-//    @GetMapping("/announcement")
-//    public String showInternDashboard(Model model) {
-//
-//    List<Announcement> announcements = announcementService.getInternAnnouncements();
-//    model.addAttribute("announcements", announcements);
-////    model.addAttribute("announcements", announcementService.getInternAnnouncements());
-//    return "intern/intern_dashboard"; // Returns the intern dashboard
-//}
-
-
-//    @GetMapping("/announcement")
-//    public String showInternDashboard(Model model) {
-//        List<Announcement> announcements = announcementService.getInternAnnouncements();
+//    try {
+//        ResponseEntity<Announcement[]> response = restTemplate.getForEntity(adminUrl, Announcement[].class);
+//        List<Announcement> announcements = Arrays.asList(response.getBody());
 //        model.addAttribute("announcements", announcements);
-//        try {
-//            Announcement  announcement = new Announcement();
-//            System.out.println("Current Intern ID: " + announcement.getTitle());
-//            System.out.println("Current Intern First Name: " + announcement.getContent());
-//            System.out.println("Current Intern Last Name: " + announcement.getCreatedAt().toString() );
-//
-//            announcementService.getAllAnnouncements();
-//            return "redirect:/bisag/intern/intern_dashboard";
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return "redirect:/bisag/intern/feedback_form?error=true";
-//        }
+//    } catch (Exception e) {
+//        model.addAttribute("announcements", List.of()); // Handle errors gracefully
 //    }
+//
+//    return "intern/intern_dashboard";
+//}
 
 }

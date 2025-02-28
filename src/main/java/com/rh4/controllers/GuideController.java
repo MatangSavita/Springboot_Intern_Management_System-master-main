@@ -3,40 +3,34 @@ package com.rh4.controllers;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.security.Principal;
+import java.util.*;
 
+import com.rh4.entities.*;
+import com.rh4.models.ProjectDefinition;
+import com.rh4.repositories.GuideRepo;
+import com.rh4.repositories.InternRepo;
+import com.rh4.services.*;
+import jakarta.persistence.Id;
+import org.apache.xmlbeans.impl.soap.SOAPElement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.rh4.entities.Admin;
-import com.rh4.entities.GroupEntity;
-import com.rh4.entities.Guide;
-import com.rh4.entities.Intern;
-import com.rh4.entities.MyUser;
-import com.rh4.entities.WeeklyReport;
 import com.rh4.repositories.GroupRepo;
-import com.rh4.services.AdminService;
-import com.rh4.services.GroupService;
-import com.rh4.services.GuideService;
-import com.rh4.services.InternService;
-import com.rh4.services.MyUserService;
-import com.rh4.services.WeeklyReportService;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/bisag/guide")
@@ -57,10 +51,20 @@ public class GuideController {
     @Autowired
     private GroupRepo groupRepo;
     @Autowired
+    private VerificationService verificationService;
+    @Autowired
+    private InternRepo internRepo;
+    @Autowired
     private MyUserService myUserService;
     Intern internFromUploadFileMethod;
     int CurrentWeekNo;
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private GuideRepo guideRepo;
+    @Autowired
+    private GroupEntity groupEntity;
+    @Autowired
+    private GroupEntity group;
 
     public static String encodePassword(String rawPassword) {
         return passwordEncoder.encode(rawPassword);
@@ -187,6 +191,28 @@ public class GuideController {
         groupRepo.save(group);
         return "redirect:/bisag/guide/guide_pending_def_approvals";
     }
+
+
+    //===================guide side approve definitions=========================================///
+//    @PostMapping("/guide_pending_def_approvals/{internId}")
+//    public ResponseEntity<Map<String, Object>> approveProjectDefinition(@PathVariable String internId) {
+//        Map<String, Object> response = new HashMap<>();
+//
+//        Optional<Intern> internOptional = internRepo.findById(internId);
+//        if (internOptional.isPresent()) {
+//            Intern intern = internOptional.get();
+//            intern.setProjectDefinitionName("Approved"); // Change status to Approved
+//            internRepo.save(intern);
+//
+//            response.put("success", true);
+//            response.put("message", "Project Definition Approved!");
+//            return ResponseEntity.ok(response);
+//        } else {
+//            response.put("success", false);
+//            response.put("message", "Intern not found");
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+//        }
+//    }
 
     @GetMapping("/admin_pending_def_approvals")
     public ModelAndView pendingFromAdmin() {
@@ -318,5 +344,170 @@ public class GuideController {
         guideService.changePassword(guide, newPassword);
         return "redirect:/logout";
     }
+
+
+//============================approve definition by  guide and provided by admin=============================================//
+
+    @GetMapping("/approveDefinition")
+    public String showApproveDefinitionForm(Model model) {
+        // Fetch all groups where project definition status is "gpending"
+        List<GroupEntity> pendingGroups = groupRepo.findByProjectDefinitionStatus("gpending");
+
+        if (pendingGroups.isEmpty()) {
+            model.addAttribute("error", "No pending project definitions found!");
+        } else {
+            model.addAttribute("groups", pendingGroups);
+        }
+
+        return "guide/guide_pending_def_approvals"; // Thymeleaf template
+    }
+
+    @PostMapping("/approveDefinition")
+    public ResponseEntity<String> approveProjectDefinition(@RequestParam String groupId,
+                                                           @RequestParam String status) {
+        List<Guide> guides = guideRepo.findByGroupId(groupId);
+        if (!guides.isEmpty()) {
+            for (Guide guide : guides) {
+                guide.setDefinitionStatus(status);
+                guideRepo.save(guide);
+            }
+
+            GroupEntity group = groupRepo.getByGroupId(groupId);
+            if (group != null) {
+                if ("Approved".equalsIgnoreCase(status)) {
+                    group.setProjectDefinitionStatus("Approved");
+                } else {
+                    group.setProjectDefinitionStatus("Rejected");
+                }
+                groupRepo.save(group);
+            }
+
+            return ResponseEntity.ok("Project Definition " + status);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Guide not found.");
+    }
+
+    //============================ end approve definition by  guide and provided by admin=============================================//
+
+
+    //============================ create definition by  guide and sent to the admin=============================================//
+
+
+    @GetMapping("/create_project_def")
+    public String showAssignProjectDefinitionForm(Model model) {
+        Guide guide = getSignedInGuide();
+        List<GroupEntity> groups = guideService.getInternGroups(guide);
+        model.addAttribute("groups", groups);
+        return "guide/create_project_def";
+
+}
+
+//    @PostMapping("/create_project_def")
+//    public ResponseEntity<String> submitProjectDefinition(@RequestParam String groupId,
+//                                                          @RequestParam String description,
+//                                                          @RequestParam String projectDefinition) {
+//        // Fetch the group based on groupId
+//        GroupEntity group = groupRepo.getByGroupId(groupId);
+//
+//        if (group == null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Group not found.");
+//        }
+//
+//        // Set project details and send to Admin for approval
+//        group.setProjectDefinition(projectDefinition);
+//        group.setDescription(description);
+//        group.setProjectDefinitionStatus("pending"); // Waiting for Admin Approval
+//        groupRepo.save(group);
+//
+//        return ResponseEntity.ok("Project Definition Submitted. Waiting for Admin Approval.");
+//    }
+
+    @PostMapping("/create_project_def")
+    public String submitProjectDefinition(@RequestParam String groupId,
+                                          @RequestParam String description,
+                                          @RequestParam String projectDefinition,
+                                          Model model) {
+        GroupEntity group = groupRepo.getByGroupId(groupId);
+
+        if (group == null) {
+            model.addAttribute("success", "❌ Group not found.");
+            return "guide/create_project_def"; // Stay on the same page
+        }
+
+        group.setProjectDefinition(projectDefinition);
+        group.setDescription(description);
+        group.setProjectDefinitionStatus("pending");
+        groupRepo.save(group);
+
+//        model.addAttribute("success", "✅ Project Definition Submitted. Waiting for Admin Approval.");
+//        return "redirect:/bisag/guide/guide_dashboard"; // Stay on the same page with alert box
+        return "guide/create_project_def";
+    }
+
+    //============================ end create definition by  guide and sent to the admin=============================================//
+
+
+    @GetMapping("/view_weekly_reports/{weekNo}")
+    public ModelAndView chanegWeeklyReportSubmission(@PathVariable("weekNo") int weekNo) {
+        ModelAndView mv = new ModelAndView("intern/change_weekly_report");
+        Intern inetrn = getSignedInIntern();
+        GroupEntity group = inetrn.getGroup();
+        WeeklyReport report = weeklyReportService.getReportByWeekNoAndGroupId(weekNo, group);
+        MyUser user = myUserService.getUserByUsername(report.getReplacedBy().getUsername());
+        if (user.getRole().equals("GUIDE")) {
+            Guide guide = guideService.getGuideByUsername(user.getUsername());
+            String status = "Your Current Weekly report is required some modifications given by guide. Please check it out.";
+            mv.addObject("status", status);
+            mv.addObject("replacedBy", guide.getName());
+        } else if (user.getRole().equals("INTERN")) {
+            Intern intern = internService.getInternByUsername(user.getUsername());
+            mv.addObject("replacedBy", intern.getFirstName() + " " + intern.getLastName());
+            mv.addObject("status",
+                    "Your current weekly report is accepted and if any changes are required then you will be notified.");
+        }
+        mv.addObject("report", report);
+        mv.addObject("group", group);
+        return mv;
+    }
+
+
+    public Intern getSignedInIntern() {
+        String username = (String) session.getAttribute("username");
+        Intern intern = internService.getInternByUsername(username);
+        if (intern.getIsActive()) {
+            return intern;
+        } else {
+            return null;
+        }
+    }
+
+    @GetMapping("/viewPdf/{internId}/{weekNo}")
+    public ResponseEntity<byte[]> viewPdf(@PathVariable String internId, @PathVariable int weekNo) {
+        WeeklyReport report = weeklyReportService.getReportByInternIdAndWeekNo(internId, weekNo);
+        byte[] pdfContent = report.getSubmittedPdf();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+
+        return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
+    }
+
+
+
+    @GetMapping("/viewProjectDefinition/{groupId}")
+    public ResponseEntity<byte[]> viewProjectDefinition(@PathVariable String groupId) {
+        GroupEntity group = groupService.getGroupByGroupId(groupId);
+
+        if (group == null || group.getProjectDefinitionDocument() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        byte[] pdfContent = group.getProjectDefinitionDocument();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+
+        return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
+    }
+
 
 }

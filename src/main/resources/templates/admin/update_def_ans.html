@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>IMS Admin Panel</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <style>
+        .form-container {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .hover-element:hover {
+            cursor: pointer; /* Change cursor to pointer on hover */
+        }
+
+        /* Style for the dropdown container */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Style for the dropdown button */
+        .dropdown button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Style for the dropdown content (hidden by default) */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        /* Style for each dropdown item */
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* Show the dropdown content when the dropdown button is hovered over */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Exclude hover effect for elements with "exclude-hover" class */
+        tr.hover-element th div.dropdown .rounded button.btn-primary:hover {
+            background-color: transparent; /* or any other styling you want */
+            color: inherit; /* or any other styling you want */
+        }
+
+        .lgout {
+            padding: 10px;
+            list-style-type: none;
+            border: 2px solid;
+            border-radius: 10px;
+        }
+
+        .table th {
+            cursor: pointer;
+            background-image: url('default-icon.png'); /* Default icon image */
+            background-size: 16px 16px; /* Adjust the size of the icon */
+            background-repeat: no-repeat;
+            background-position: right center;
+            /* Position the icon to the right center */
+            padding-right: 20px; /* Add some padding to accommodate the icon */
+        }
+    </style>
+</head>
+
+<body>
+
+
+<!-- Include the header fragment -->
+<div th:replace="fragments/headerFragment :: header"></div>
+
+<!-- Include the aside fragment -->
+<div th:replace="fragments/asideFragment :: aside"></div>
+
+
+<main id="main" class="main">
+
+    <input type="text" class="mb-4" id="searchInput"
+           placeholder="Search...">
+
+    <form th:action="@{/bisag/admin/update_def_ans}" method="post">
+
+        <!-- Display error message if no pending definitions -->
+        <div th:if="${error}" style="color: red;">
+            <p th:text="${error}"></p>
+        </div>
+
+        <!-- Display success message -->
+        <div th:if="${success}" style="color: green;">
+            <p th:text="${success}"></p>
+        </div>
+
+        <table class="table datatable table-bordered">
+            <tr>
+                <th>Group ID</th>
+                <th>Description</th>
+                <th>Project Definition</th>
+                <th>Actions</th>
+            </tr>
+            <tr th:each="group : ${groups}">
+                <td th:text="${group.groupId}"></td>
+                <td th:text="${group.description}"></td>
+                <td th:text="${group.projectDefinition}"></td>
+                <td>
+                    <form th:action="@{/bisag/admin/update_def_ans}" method="post">
+                        <input type="hidden" name="groupId" th:value="${group.groupId}" />
+                        <button type="submit" name="status" value="approved">Approve</button>
+                        <button type="submit" name="status" value="rejected">Reject</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+
+    <!-- Include the footer fragment -->
+    <div th:replace="fragments/footerFragment :: footer"></div>
+</main>
+
+<!-- End #main -->
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script
+        src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document)
+        .ready(
+            function() {
+                // Add click event listener to table headers for sorting
+                $('.table th').click(
+                    function() {
+                        var table = $(this).parents('table')
+                            .eq(0);
+                        var rows = table.find('tr:gt(0)')
+                            .toArray().sort(
+                                comparer($(this)
+                                    .index()));
+                        this.asc = !this.asc;
+                        if (!this.asc) {
+                            rows = rows.reverse();
+                        }
+                        for (var i = 0; i < rows.length; i++) {
+                            table.append(rows[i]);
+                        }
+                    });
+
+                // Function to compare rows based on the selected column
+                function comparer(index) {
+                    return function(a, b) {
+                        var valA = getCellValue(a, index), valB = getCellValue(
+                            b, index);
+                        return $.isNumeric(valA)
+                        && $.isNumeric(valB) ? valA - valB
+                            : valA.toString().localeCompare(
+                                valB);
+                    };
+                }
+
+                // Function to get the value of a cell
+                function getCellValue(row, index) {
+                    return $(row).children('td').eq(index).text();
+                }
+            });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var searchInput = document.getElementById('searchInput');
+        var tableRows = document.querySelectorAll('.table tbody tr');
+
+        searchInput.addEventListener('input', function(event) {
+            var searchText = event.target.value.toLowerCase().trim();
+
+            tableRows.forEach(function(row) {
+                var isVisible = false;
+                row.querySelectorAll('td').forEach(function(cell) {
+                    var cellText = cell.textContent.toLowerCase();
+                    if (cellText.includes(searchText)) {
+                        isVisible = true;
+                    }
+                });
+
+                if (isVisible) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+</body>
+
+</html>

@@ -64,7 +64,17 @@
 					</div>
 					<div class="form-group">
 						<label for="location">College Location:</label> <input type="text"
-							class="form-control" id="field2" name="location">
+							class="form-control" id="field" name="location" required>
+					</div>
+
+					<div class="form-group">
+						<label for="contact">College Contact:</label> <input type="number"
+							class="form-control" id="field5" name="contact" required >
+					</div>
+
+					<div class="form-group">
+						<label for="email">College Email:</label> <input type="email"
+							class="form-control" id="field4" name="email" required>
 					</div>
 					<button type="submit" class="btn btn-primary">Submit</button>
 				</form>
@@ -77,11 +87,14 @@
 						<div class="card">
 							<div class="card-body">
 								<h5 class="card-title">Datatables</h5>
-								<table class="table datatable table-bordered">
+								<div class="table-responsive">
+								<table  class="table datatable table-bordered ">
 									<thead>
 										<tr>
 											<th>College</th>
 											<th>Location</th>
+											<th>Contact</th>
+											<th>Email</th>
 											<th>Update</th>
 											<th>Delete</th>
 										</tr>
@@ -96,6 +109,10 @@
 													name="name" class="no-border" /></td>
 												<td><input type="text" th:value="${college.location}"
 													name="location" class="no-border" /></td>
+												<td><input type="text" th:value="${college.contact}"
+													name="contact" class="no-border" /></td>
+												<td><input type="text" th:value="${college.email}"
+													name="email" class="no-border" /></td>
 
 												<td>
 													<div class="button-container">
@@ -119,6 +136,7 @@
 									</tbody>
 
 								</table>
+							</div>
 							</div>
 						</div>
 					</div>
@@ -147,7 +165,7 @@
 						<div class="card">
 							<div class="card-body">
 								<h5 class="card-title">Datatables</h5>
-								<table
+								<table>
 									class="table datatable table-bordered">
 									<thead>
 										<tr>
@@ -159,11 +177,13 @@
 									<tbody>
 										<!-- Iterate over a list of colleges -->
 										<tr th:each="branch : ${branches}">
-											<form
+											<form>
 												th:action="@{'/bisag/admin/update_branch/' + ${branch.branchId}}"
 												method="post">
-												<td><input type="text" th:value="${branch.name}"
-													name="name" class="no-border" /></td>
+												<td><label>
+													<input type="text" th:value="${branch.name}"
+														name="name" class="no-border" />
+												</label></td>
 
 												<td>
 													<div class="button-container">

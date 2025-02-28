@@ -144,11 +144,11 @@
 <main id="main" class="main">
     <div class="announcement-board">
         <h2 class="board-title">📢 Announcements</h2>
-        <div th:each="announcement : ${announcements}" class="announcement-card">
-            <h3 class="announcement-title" th:text="${announcement.title}"></h3>
-            <p class="announcement-content" th:text="${announcement.content}"></p>
-            <span class="announcement-date" th:text="${announcement.createdAt}"></span>
-        </div>
+            <div th:each="announcement: ${announcements}" class="announcement-card">
+                            <h3 class="announcement-title" th:text="${announcement.title}"></h3>
+                            <p class="announcement-content" th:text="${announcement.content}"></p>
+                            <span class="announcement-date" th:text="${announcement.createdAt}"></span>
+            </div>
     </div>
 
     <script>

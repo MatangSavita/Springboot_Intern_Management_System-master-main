@@ -90,9 +90,9 @@ public class WeeklyReportService {
 
 //	for year------------
 
-	public List<WeeklyReport> getReportsByYear(int year) {
-		return weeklyReportRepo.findReportsByYear(year);
-	}
+//	public List<WeeklyReport> getReportsByYear(int year) {
+//		return weeklyReportRepo.findReportsByYear(year);
+//	}
 
 //	public WeeklyReport getReportByWeekNoGroupIdAndInternId(int weekNo, GroupEntity group, String internId) {
 //		return weeklyReportRepo.findByWeekNoAndGroupAndInternId(weekNo, group, internId);

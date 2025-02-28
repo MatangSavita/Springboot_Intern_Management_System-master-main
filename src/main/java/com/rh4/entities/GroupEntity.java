@@ -24,6 +24,9 @@ public class GroupEntity {
 	
 	@Column(name = "project_definition_status")
 	private String projectDefinitionStatus = "pending";
+
+	@Column(name = "project_updated_definition_status")
+	private String projectUpdateDefinitionStatus = "pending";
 	
 	@Column(name = "final_report_status")
 	private String finalReportStatus = "pending";
@@ -48,7 +51,7 @@ public class GroupEntity {
 		}
   	
 	public GroupEntity(long id, String groupId, String projectDefinition, String description, byte[] finalReport, String finalReportStatus,
-		String projectDefinitionStatus, byte[] projectDefinitionDocument, String domain, Guide guide) {
+		String projectDefinitionStatus, byte[] projectDefinitionDocument, String domain, Guide guide, String projectUpdateDefinitionStatus) {
 	super();
 	this.id = id;
 	this.groupId = groupId;
@@ -60,6 +63,7 @@ public class GroupEntity {
 	this.projectDefinitionStatus = projectDefinitionStatus;
 	this.projectDefinitionDocument = projectDefinitionDocument;
 	this.guide = guide;
+	this.projectUpdateDefinitionStatus = projectUpdateDefinitionStatus;
 }
 	public String getFinalReportStatus() {
 		return finalReportStatus;
@@ -115,7 +119,7 @@ public class GroupEntity {
 	}
 
 	public void setProjectDefinition(String projectDefinition) {
-		this.projectDefinition = projectDefinition;
+		this.projectDefinition = projectDefinition;  //helo
 	}
 
 	public String getDescription() {
@@ -123,7 +127,7 @@ public class GroupEntity {
 	}
 
 	public void setDescription(String description) {
-		this.description = description;
+		this.description = description; //hello
 	}
 
 	public String getProjectDefinitionStatus() {
@@ -133,6 +137,15 @@ public class GroupEntity {
 	public void setProjectDefinitionStatus(String projectDefinitionStatus) {
 		this.projectDefinitionStatus = projectDefinitionStatus;
 	}
+
+
+	public String getProjectUpdateDefinitionStatus() {
+	   return projectUpdateDefinitionStatus;
+	}
+	public void setProjectUpdateDefinitionStatus(String projectUpdateDefinitionStatus) {
+	   this.projectUpdateDefinitionStatus = projectUpdateDefinitionStatus;
+	}
+
 
 	public byte[] getProjectDefinitionDocument() {
 		return projectDefinitionDocument;

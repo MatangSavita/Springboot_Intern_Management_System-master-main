@@ -94,6 +94,9 @@ public class AdminController {
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Autowired
     private GroupEntity groupEntity;
+    private String groupId;
+    @Autowired
+    private GuideRepo guideRepo;
 
 
     //    constrcctor for the yearly report service -------
@@ -247,6 +250,9 @@ public class AdminController {
     }
     // Admin Dashboard
 
+
+
+
     @GetMapping("/admin_dashboard")
     public ModelAndView admin_dashboar(Model model) {
 
@@ -346,6 +352,7 @@ public class AdminController {
         return mv;
     }
 
+
     @GetMapping("/intern_application/{id}")
     public ModelAndView internApplication(@PathVariable("id") long id, Model model) {
         System.out.println("id" + id);
@@ -362,6 +369,7 @@ public class AdminController {
         mv.setViewName("admin/intern_application_detail");
         return mv;
     }
+
 
     @GetMapping("/intern_application_docs/{id}")
     public ModelAndView internApplicationDocs(@PathVariable("id") long id, Model model) {
@@ -925,44 +933,82 @@ public class AdminController {
     }
 
 
-    @PostMapping("/intern_application/update")
-    public String internApplicationSubmission(@RequestParam long id, InternApplication internApplication, MultipartHttpServletRequest req) throws IllegalStateException, IOException, Exception {
-        Optional<InternApplication> intern = internService.getInternApplication(id);
+//    @PostMapping("/intern_application/update")
+//    public String internApplicationSubmission(@RequestParam long id, InternApplication internApplication, MultipartHttpServletRequest req) throws IllegalStateException, IOException, Exception {
+//        Optional<InternApplication> intern = internService.getInternApplication(id);
+//
+//        if (internApplication.getIsActive()) {
+//            intern.get().setFirstName(internApplication.getFirstName());
+//            intern.get().setLastName(internApplication.getLastName());
+//            intern.get().setContactNo(internApplication.getContactNo());
+//
+//            MyUser user = myUserService.getUserByUsername(intern.get().getEmail());
+//            user.setUsername(internApplication.getEmail());
+//            userRepo.save(user);
+//
+//            intern.get().setEmail(internApplication.getEmail());
+//            intern.get().setCollegeName(internApplication.getCollegeName());
+//            intern.get().setIsActive(true);
+//            intern.get().setBranch(internApplication.getBranch());
+//            intern.get().setDomain(internApplication.getDomain());
+//            intern.get().setSemester(internApplication.getSemester());
+//            intern.get().setJoiningDate(internApplication.getJoiningDate());
+//            intern.get().setCompletionDate(internApplication.getCompletionDate());
+//        } else {
+//            intern.get().setIsActive(false);
+//            Cancelled cancelledEntry = new Cancelled();
+//            cancelledEntry.setTableName("InternApplication");
+//            cancelledEntry.setCancelId(Long.toString(intern.get().getId()));
+//            cancelledRepo.save(cancelledEntry);
+//        }
+//        intern.get().setUpdatedAt(LocalDateTime.now());
+//        internService.addInternApplication(intern.get());
+//        return "redirect:/bisag/admin/intern_application/" + id;
+//    }
+@PostMapping("/intern_application/update")
+public String internApplicationSubmission(@RequestParam long id, InternApplication internApplication, MultipartHttpServletRequest req) throws IllegalStateException, IOException, Exception {
+    Optional<InternApplication> intern = internService.getInternApplication(id);
 
-        if (internApplication.getIsActive()) {
-            intern.get().setFirstName(internApplication.getFirstName());
-            intern.get().setLastName(internApplication.getLastName());
-            intern.get().setContactNo(internApplication.getContactNo());
+    if (internApplication.getIsActive()) {
+        intern.get().setFirstName(internApplication.getFirstName());
+        intern.get().setLastName(internApplication.getLastName());
+        intern.get().setContactNo(internApplication.getContactNo());
 
-            MyUser user = myUserService.getUserByUsername(intern.get().getEmail());
-            user.setUsername(internApplication.getEmail());
-            userRepo.save(user);
+        MyUser user = myUserService.getUserByUsername(intern.get().getEmail());
+        user.setUsername(internApplication.getEmail());
+        userRepo.save(user);
 
-            intern.get().setEmail(internApplication.getEmail());
-            intern.get().setCollegeName(internApplication.getCollegeName());
-            intern.get().setIsActive(true);
-            intern.get().setBranch(internApplication.getBranch());
-            intern.get().setDomain(internApplication.getDomain());
-            intern.get().setSemester(internApplication.getSemester());
-            intern.get().setJoiningDate(internApplication.getJoiningDate());
-            intern.get().setCompletionDate(internApplication.getCompletionDate());
-        } else {
-            intern.get().setIsActive(false);
-            Cancelled cancelledEntry = new Cancelled();
-            cancelledEntry.setTableName("InternApplication");
-            cancelledEntry.setCancelId(Long.toString(intern.get().getId()));
-            cancelledRepo.save(cancelledEntry);
-        }
-        intern.get().setUpdatedAt(LocalDateTime.now());
-        internService.addInternApplication(intern.get());
-        return "redirect:/bisag/admin/intern_application/" + id;
+        intern.get().setEmail(internApplication.getEmail());
+        intern.get().setCollegeName(internApplication.getCollegeName());
+        intern.get().setIsActive(true);
+        intern.get().setBranch(internApplication.getBranch());
+        intern.get().setDomain(internApplication.getDomain());
+        intern.get().setSemester(internApplication.getSemester());
+        intern.get().setJoiningDate(internApplication.getJoiningDate());
+        intern.get().setCompletionDate(internApplication.getCompletionDate());
+//        intern.get().setGuideName(internApplication.getGuideName());
+//        intern.get().setGuideId(internApplication.getGuideId());
+
+        logService.saveLog(String.valueOf(id), "Updated intern application details", "InternApplication Update");
+    } else {
+        intern.get().setIsActive(false);
+        Cancelled cancelledEntry = new Cancelled();
+        cancelledEntry.setTableName("InternApplication");
+        cancelledEntry.setCancelId(Long.toString(intern.get().getId()));
+        cancelledRepo.save(cancelledEntry);
+
+        logService.saveLog(String.valueOf(id), "Cancelled intern application", "InternApplication Cancellation");
     }
+
+    intern.get().setUpdatedAt(LocalDateTime.now());
+    internService.addInternApplication(intern.get());
+    return "redirect:/bisag/admin/intern_application/" + id;
+}
 
 
     @PostMapping("/intern/update")
     public String updateIntern(@RequestParam String id, Intern internApplication, @RequestParam("groupId") String groupId, MultipartHttpServletRequest req) throws IllegalStateException, IOException, Exception {
         Optional<Intern> intern = internService.getIntern(id);
-
 
         if (groupId.equals("createOwnGroup")) {
             String generatedId = generateGroupId();
@@ -973,6 +1019,7 @@ public class AdminController {
         } else {
             intern.get().setGroup(groupService.getGroup(groupId));
         }
+
         if (intern.get().getIsActive()) {
             intern.get().setFirstName(internApplication.getFirstName());
             intern.get().setLastName(internApplication.getLastName());
@@ -1001,21 +1048,25 @@ public class AdminController {
             intern.get().setDegree(internApplication.getDegree());
             intern.get().setAggregatePercentage(internApplication.getAggregatePercentage());
             intern.get().setUsedResource(internApplication.getUsedResource());
+
+            logService.saveLog(id, "Updated intern details", "Intern Update");
         }
 
         if (!internApplication.getIsActive()) {
             intern.get().setIsActive(false);
-            intern.get().setCancellationStatus("cancelled");
+            intern.get().setCancellationStatus("Cancelled");
             Cancelled cancelledEntry = new Cancelled();
             cancelledEntry.setTableName("intern");
             cancelledEntry.setCancelId(intern.get().getInternId());
             cancelledRepo.save(cancelledEntry);
+
+            logService.saveLog(id, "Cancelled intern", "Intern Cancellation");
         }
+
         intern.get().setUpdatedAt(LocalDateTime.now());
         internRepo.save(intern.get());
         return "redirect:/bisag/admin/intern/" + id;
     }
-
 
     @GetMapping("/intern_application/approved_interns")
     public ModelAndView approvedInterns(Model model) {
@@ -1074,10 +1125,9 @@ public class AdminController {
     }
 
     @PostMapping("/intern_application/approved_intern/ans")
-    public String approvedInterns(@RequestParam String message, @RequestParam long id,
-                                  @RequestParam String finalStatus) {
-        System.out.println("id" + id + finalStatus);
-        // Long ID = Long.parseLong(id);
+    public String approvedInterns(@RequestParam String message, @RequestParam long id, @RequestParam String finalStatus) {
+        System.out.println("id: " + id + ", finalStatus: " + finalStatus);
+
         Optional<InternApplication> intern = internService.getInternApplication(id);
         intern.get().setFinalStatus(finalStatus);
         internService.addInternApplication(intern.get());
@@ -1085,13 +1135,21 @@ public class AdminController {
         if (finalStatus.equals("failed")) {
             emailService.sendSimpleEmail(intern.get().getEmail(), "You are Failed", "BISAG INTERNSHIP RESULT");
         } else {
-            String finalmessage = message + "\n" + "username: " + intern.get().getFirstName()
-                    + intern.get().getLastName() + "\n Password: " + intern.get().getFirstName() + "_"
-                    + intern.get().getId();
-            emailService.sendSimpleEmail(intern.get().getEmail(), finalmessage, "BISAG INTERNSHIP RESULT");
+            String finalMessage = message + "\n" + "Username: " + intern.get().getFirstName() +
+                    intern.get().getLastName() + "\n Password: " + intern.get().getFirstName() + "_" + intern.get().getId();
+            emailService.sendSimpleEmail(intern.get().getEmail(), finalMessage, "BISAG INTERNSHIP RESULT");
         }
+
+        String username = (String) session.getAttribute("username");
+        Admin admin = adminService.getAdminByUsername(username);
+        if (admin != null) {
+            logService.saveLog(String.valueOf(admin.getAdminId()), "Updated Final Status",
+                    "Admin with ID: " + admin.getAdminId() + " updated final status of intern with ID: " + id + " to " + finalStatus);
+        }
+
         return "redirect:/bisag/admin/intern_application/approved_interns";
     }
+
 
     @GetMapping("/intern_application/new_interns")
     public ModelAndView newInterns(Model model) {
@@ -1129,7 +1187,6 @@ public class AdminController {
         group.setGroupId(id);
         groupService.registerGroup(group);
 
-        // register those intern
         for (Long internId : selectedInterns) {
             Optional<InternApplication> internApplicationOptional = internService.getInternApplication(internId);
 
@@ -1138,7 +1195,6 @@ public class AdminController {
                 internApplication.setGroupCreated(true);
                 internService.addInternApplication(internApplication);
 
-                // Create an Intern object using a constructor or a factory method
                 Intern intern = new Intern(internApplication.getFirstName(), internApplication.getLastName(),
                         internApplication.getContactNo(), internApplication.getEmail(),
                         internApplication.getCollegeName(), internApplication.getJoiningDate(),
@@ -1149,8 +1205,16 @@ public class AdminController {
 
                 intern.setInternId(generateInternId());
                 internService.addIntern(intern);
-            }
 
+                // Log action for each intern registration
+                String username = (String) session.getAttribute("username");
+                Admin admin = adminService.getAdminByUsername(username);
+                if (admin != null) {
+                    logService.saveLog(String.valueOf(admin.getAdminId()), "Created Group and Registered Intern",
+                            "Admin " + admin.getName() + " created a group and registered intern "
+                                    + internApplication.getFirstName() + " " + internApplication.getLastName());
+                }
+            }
         }
         return "redirect:/bisag/admin/create_group";
     }
@@ -1289,6 +1353,11 @@ public class AdminController {
         return "redirect:/bisag/admin/add_fields";
     }
 
+//    @PostMapping("/update_definitions/{groupId}")
+//    public String UpdateDefinition(@ModelAttribute("groupEntity") GroupEntity groupEntity, @PathVariable String groupId){
+//       Optional<GroupEntity> GE = groupService.getGroup(groupId);
+//    }
+
 
     // ----------------------------------- Guide registration
     // ---------------------------------------//
@@ -1385,7 +1454,7 @@ public class AdminController {
         return "redirect:/bisag/admin/guide_list";
     }
 
-    // Manage group
+    // c group
     @GetMapping("/allocate_guide")
     public ModelAndView manageGroup(Model model) {
         ModelAndView mv = new ModelAndView();
@@ -1422,6 +1491,14 @@ public class AdminController {
     public String assignGuide(@RequestParam("guideid") long guideid, @RequestParam("groupId") String groupId) {
         System.out.println("guide id: " + guideid);
         groupService.assignGuide(groupId, guideid);
+
+        String username = (String) session.getAttribute("username");
+        Admin admin = adminService.getAdminByUsername(username);
+        if (admin != null) {
+            logService.saveLog(String.valueOf(admin.getAdminId()), "Assigned Guide to Group",
+                    "Admin " + admin.getName() + " assigned guide with ID: " + guideid + " to group with ID: " + groupId);
+        }
+
         return "redirect:/bisag/admin/allocate_guide";
     }
 
@@ -1462,6 +1539,9 @@ public class AdminController {
         return "redirect:/bisag/admin/admin_pending_def_approvals";
     }
 
+
+
+
     @GetMapping("/admin_weekly_report")
     public ModelAndView weeklyReport(Model model) {
         ModelAndView mv = new ModelAndView("/admin/admin_weekly_report");
@@ -1478,30 +1558,7 @@ public class AdminController {
         return mv;
     }
 
-//    @GetMapping("/admin_weekly_report_details/{groupId}/{weekNo}")
-//    public ModelAndView changeWeeklyReportSubmission(@PathVariable("groupId") String groupId,
-//                                                     @PathVariable("weekNo") int weekNo, Model model) {
-//        ModelAndView mv = new ModelAndView("/admin/admin_weekly_report_details");
-//        model = countNotifications(model);
-//        Admin admin = getSignedInAdmin();
-//        GroupEntity group = groupService.getGroup(groupId);
-//        WeeklyReport report = weeklyReportService.getReportByWeekNoAndGroupId(weekNo, group);
-//        MyUser user = myUserService.getUserByUsername(admin.getEmailId());
-//        if (user.getRole().equals("ADMIN")) {
-//
-//            String name = admin.getName();
-//            mv.addObject("replacedBy", name);
-//
-//        } else if (user.getRole().equals("INTERN")) {
-//            Intern intern = internService.getInternByUsername(user.getUsername());
-//            mv.addObject("replacedBy", intern.getFirstName() + intern.getLastName());
-//        } else {
-//        }
-//        mv.addObject("report", report);
-//        mv.addObject("group", group);
-//
-//        return mv;
-//    }
+
 
 
     @GetMapping("/admin_weekly_report_details/{groupId}/{weekNo}")
@@ -1594,6 +1651,23 @@ public class AdminController {
     }
 
 
+
+
+// ==============this is for view project definition documents==================
+    @GetMapping("/viewProjectDefinition/{groupId}")
+    public ResponseEntity<byte[]> viewProjectDefinition(@PathVariable String groupId) {
+        GroupEntity group = groupService.getGroupByGroupId(groupId);
+
+        if (group == null || group.getProjectDefinitionDocument() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        byte[] pdfContent = group.getProjectDefinitionDocument();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+
+        return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
+    }
 
 
 
@@ -2087,22 +2161,140 @@ public class AdminController {
         }
 
 
+//==========================================update definition by admin==========================================================//
 
+    @GetMapping("/update_project_def")
+    public String showAssignProjectDefinitionForm(Model model) {
+        List<GroupEntity> groups = groupRepo.findAll();
+        model.addAttribute("groups", groups);
+        return "admin/update_project_def";
+    }
 
-//    @PostMapping("/announcements/add")
-//    public String addAnnouncement(@RequestParam String title,
-//                                  @RequestParam String description,
-//                                  RedirectAttributes redirectAttributes) {
-//        Announcement announcement = new Announcement(title, description);
-//        announcementService.saveAnnouncement(announcement);
-//        redirectAttributes.addFlashAttribute("message", "Announcement added successfully!");
-//        return "redirect:/announcements";
-
-
-//        @PostMapping()
-//        public Annoucement createAnnoucement(@RequestBody Annoucement announcement) {
-//        return announcementService.createAnnoucement(announcement);
+//    @PostMapping("/update_project_def")
+//    public ResponseEntity<String> assignProjectDefinition(@RequestParam String groupId,
+//                                                          @RequestParam String projectDefinition,
+//                                                          @RequestParam String description) {
+//        // Fetch the group based on groupId
+//        GroupEntity group = groupRepo.getByGroupId(groupId);
+//
+//        if (group == null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Group not found.");
 //        }
+//
+//        // Update Project Definition and Set Status to "Pending Approval"
+//        group.setProjectDefinition(projectDefinition);
+//        group.setDescription(description);
+//        group.setProjectDefinitionStatus("gpending");  // Use the correct status key
+//        groupRepo.save(group);
+//
+//        // Fetch the guides related to the group
+//        List<Guide> guides = guideRepo.findByGroupId(group.getGroupId());
+//
+//        if (guides == null || guides.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No guides found for the group.");
+//        }
+//
+//        // Update each guide's status to "Pending"
+//        for (Guide guide : guides) {
+//            guide.setDefinitionStatus("Pending");
+//            guideRepo.save(guide);
+//        }
+//
+//        return ResponseEntity.ok("Project Definition Assigned and Sent for Approval.");
+//    }
+
+
+    @PostMapping("/update_project_def")
+    public String assignProjectDefinition(@RequestParam String groupId,
+                                          @RequestParam String projectDefinition,
+                                          @RequestParam String description,
+                                          Model model) {
+        // Fetch the group based on groupId
+        GroupEntity group = groupRepo.getByGroupId(groupId);
+
+        if (group == null) {
+            model.addAttribute("error", "❌ Group not found.");
+            return "admin/update_project_def"; // Stay on the same page
+        }
+
+        // Update Project Definition and Set Status to "Pending Approval"
+        group.setProjectDefinition(projectDefinition);
+        group.setDescription(description);
+        group.setProjectDefinitionStatus("gpending");
+        groupRepo.save(group);
+
+        // Fetch the guides related to the group
+        List<Guide> guides = guideRepo.findByGroupId(group.getGroupId());
+
+        if (guides == null || guides.isEmpty()) {
+            model.addAttribute("error", "❌ No guides found for the group.");
+            return "admin/update_project_def"; // Stay on the same page
+        }
+
+        // Update each guide's status to "Pending"
+        for (Guide guide : guides) {
+            guide.setDefinitionStatus("Pending");
+            guideRepo.save(guide);
+        }
+
+        model.addAttribute("success", "✅ Project Definition Assigned and Sent for Approval.");
+        return "admin/update_project_def"; // Redirect back to the admin approval page
+    }
+
+    //========================================== end update definition by admin===================================================================//
+
+
+    //========================================== update definition by guide and approve by admin==========================================================//
+
+
+    @GetMapping("/update_def_ans")
+    public String showPendingProjectDefinitions(Model model) {
+        // Fetch all groups where project definition status is "pending"
+        List<GroupEntity> pendingGroups = groupRepo.findByProjectDefinitionStatus("pending");
+
+        // Add the fetched groups to the model
+        model.addAttribute("groups", pendingGroups);
+
+        // If no pending definitions, add an error message
+        if (pendingGroups.isEmpty()) {
+            model.addAttribute("error", "No pending project definitions found!");
+        }
+
+        return "admin/update_def_ans"; // Return Thymeleaf template
+    }
+
+    @PostMapping("/update_def_ans")
+    public String updateProjectDefinition(@RequestParam String groupId,
+                                          @RequestParam String status,
+                                          RedirectAttributes redirectAttributes) {
+        GroupEntity group = groupRepo.getByGroupId(groupId);
+
+        if (group == null) {
+            redirectAttributes.addFlashAttribute("error", "Group not found.");
+            return "redirect:/bisag/admin/update_def_ans";
+        }
+
+        if (!"pending".equals(group.getProjectDefinitionStatus())) {
+            redirectAttributes.addFlashAttribute("error", "Project definition is not pending approval.");
+            return "redirect:/bisag/admin/update_def_ans";
+        }
+
+        if (!status.equalsIgnoreCase("approved") && !status.equalsIgnoreCase("rejected")) {
+            redirectAttributes.addFlashAttribute("error", "Invalid status. Use 'approved' or 'rejected'.");
+            return "redirect:/bisag/admin/update_def_ans";
+        }
+
+        // Update status and save
+        group.setProjectDefinitionStatus(status.toLowerCase());
+        groupRepo.save(group);
+
+        // Redirect with success message
+        redirectAttributes.addFlashAttribute("success", "Project Definition " + status + ".");
+        return "redirect:/bisag/admin/update_def_ans";
+    }
+
+    //==========================================  end update definition by guide and approve by admin==========================================================//
+
 
 }
 

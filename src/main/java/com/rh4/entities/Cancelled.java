@@ -13,14 +13,14 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "cancelled")
 public class Cancelled {
-	
+
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private long id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private long id;
 
 	@Column(name = "table_name")
-    private String tableName;
+	private String tableName;
 
 	@Column(name = "cancel_id")
 	private String cancelId;
@@ -59,6 +59,6 @@ public class Cancelled {
 	public void setCancelId(String cancelId) {
 		this.cancelId = cancelId;
 	}
-	
-	
+
+
 }

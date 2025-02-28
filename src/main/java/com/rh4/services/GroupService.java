@@ -16,21 +16,18 @@ public class GroupService {
 	private GroupRepo groupRepo;
 	@Autowired
 	private GuideService guideService;
-	
-	public String getMostRecentGroupId()
-	{
+
+	public String getMostRecentGroupId() {
 		GroupEntity mostRecentGroup = groupRepo.findTopByOrderByGroupIdDesc();
-        return mostRecentGroup != null ? mostRecentGroup.getGroupId() : null;
+		return mostRecentGroup != null ? mostRecentGroup.getGroupId() : null;
 	}
-	
-	public void registerGroup(GroupEntity group)
-	{
+
+	public void registerGroup(GroupEntity group) {
 		groupRepo.save(group);
 		System.out.println("GRP: " + group.getId());
 	}
-	
-	public List<GroupEntity> getGuideNotAllocatedGroup()
-	{
+
+	public List<GroupEntity> getGuideNotAllocatedGroup() {
 		return groupRepo.getGroupEntityNoGuide();
 	}
 
@@ -41,7 +38,7 @@ public class GroupService {
 	public GroupEntity getGroup(String id) {
 		return groupRepo.getByGroupId(id);
 	}
-	
+
 	public GroupEntity getGroupByGroupId(String groupid) {
 		return groupRepo.getByGroupId(groupid);
 	}
@@ -57,29 +54,33 @@ public class GroupService {
 	}
 
 	public void assignGuide(String groupid, long guideid) {
-		
+
 		Optional<Guide> guide = guideService.getGuideById(guideid);
 		GroupEntity group = getGroup(groupid);
 		group.guide = guide.get();
 		groupRepo.save(group);
 	}
 
+//	public List<GroupEntity> getGroupsByGuideId(String guideId) {
+//		return GroupRepo.findByGuideId(guideId);
+//	}
+
 	public List<GroupEntity> getGPendingGroups(Guide guide) {
-	    return groupRepo.findByGuideAndProjectDefinitionStatus(guide, "gpending");
+		return groupRepo.findByGuideAndProjectDefinitionStatus(guide, "gpending");
 	}
 
-	
+
 	public long adminPendingProjectDefinitionCount() {
-	    return groupRepo.countByProjectDefinitionStatus("gapproved");
+		return groupRepo.countByProjectDefinitionStatus("gapproved");
 	}
 
 
 	public List<GroupEntity> getAPendingGroups() {
 		return groupRepo.findByProjectDefinitionStatus("gapproved");
 	}
-	
+
 	public long countGPendingGroups() {
-	    return groupRepo.countByProjectDefinitionStatus("gpending");
+		return groupRepo.countByProjectDefinitionStatus("gpending");
 	}
 
 	public List<GroupEntity> getGPendingFinalReports(Guide guide) {

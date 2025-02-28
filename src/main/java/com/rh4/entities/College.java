@@ -22,6 +22,12 @@ public class College {
     @Column(name = "location")
     private String location;
 
+	@Column(name = "contact")
+    private String contact;
+
+	@Column(name = "email" ,unique = true)
+    private String email;
+
 	public College() {
 		super();
 	}
@@ -49,6 +55,12 @@ public class College {
 	public void setLocation(String location) {
 		this.location = location;
 	}
+
+	public String getContact() {return contact;}
+	public void setContact(String contact) {this.contact = contact;}
+
+	public String getEmail() {return email;}
+	public void setEmail(String email) {this.email = email;}
 
     
 }

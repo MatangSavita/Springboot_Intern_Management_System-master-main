@@ -261,7 +261,10 @@ h6 {
   border-color: rgb(0, 128, 255); */
   border-radius: 10px;
   box-shadow: 0px 0 30px rgba(1, 41, 112, 0.1);
+  overflow: hidden;
 }
+
+
 
 .card-header,
 .card-footer {
@@ -287,6 +290,7 @@ h6 {
 
 .card-body {
   padding: 20px 20px 20px 20px;
+  overflow-x: auto;
 }
 
 .card-img-overlay {

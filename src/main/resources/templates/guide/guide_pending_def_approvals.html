@@ -9,6 +9,64 @@
 <meta content="" name="description">
 <meta content="" name="keywords">
 <style>
+
+	/*css for definition provided by admin*/
+
+	.form-container {
+		width: 60%;
+		margin: auto;
+		padding: 20px;
+		border-radius: 8px;
+		box-shadow: 0px 0px 10px #ccc;
+		background-color: #f9f9f9;
+		text-align: center;
+	}
+	.form-container label {
+		font-weight: bold;
+		display: block;
+		margin-top: 10px;
+	}
+	.form-container select, .form-container input {
+		width: 50%;
+		padding: 8px;
+		margin-top: 5px;
+		border-radius: 5px;
+		border: 1px solid #ccc;
+	}
+	.form-container button {
+		margin-top: 15px;
+		padding: 10px 20px;
+		font-size: 16px;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+		background-color: #007bff;
+		color: white;
+	}
+	.form-container button:hover {
+		background-color: #0056b3;
+	}
+	.table-container {
+		margin-top: 20px;
+	}
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 10px;
+	}
+	th, td {
+		padding: 10px;
+		border: 1px solid #ccc;
+		text-align: center;
+	}
+	.error-message {
+		color: red;
+		font-weight: bold;
+	}
+
+	/*css for definition provided by admin*/
+
+
 .form-container {
 	display: none;
 }
@@ -131,13 +189,6 @@ tr.hover-element th div.dropdown .rounded button.btn-primary:hover {
 	border-color: #dc3545; /* Match reject border */
 }
 
-/*.form-container {*/
-/*	display: flex;*/
-/*	justify-content: center; !* Center horizontally *!*/
-/*	align-items: center; !* Center vertically *!*/
-/*	height: 100vh; !* Full viewport height *!*/
-/*}*
-/* Style the form to display items in a column */
 .status-form {
 	display: flex;
 	flex-direction: column;
@@ -204,32 +255,15 @@ tr.hover-element th div.dropdown .rounded button.btn-primary:hover {
 					<td th:text="${group.groupId}"></td>
 					<td th:text="${group.projectDefinition}"></td>
 					<td th:text="${group.description}"></td>
-					<td><a
-						th:href="@{'/files/projectDefinitionDocument/' + ${group.projectDefinitionDocument}}"
-						target="_blank"> Open Document </a></td>
+					<td>
+<!--						<a-->
+<!--						th:href="@{'/files/projectDefinitionDocument/' + ${group.projectDefinitionDocument}}"-->
+<!--						target="_blank"> Open Document </a></td>-->
+						<a th:href="@{/bisag/guide/viewProjectDefinition/{groupId}(groupId=${group.groupId})}"
+						   target="_blank" >
+							Open Document
+						</a>
 
-<!--					<td>-->
-<!--						<form class="form-container" action="/bisag/guide/guide_pending_def_approvals/ans"-->
-<!--							method="post">-->
-<!--							<input type="radio" name="gpendingAns" value="approve"-->
-<!--								id="approveRadio${group.groupId}"-->
-<!--								th:checked="${group.projectDefinitionStatus == 'gapproved'}" />-->
-<!--							<label for="approveRadio${group.groupId}">Approve</label>-->
-<!--							<input-->
-<!--								type="radio" name="gpendingAns" value="reject"-->
-<!--								id="rejectRadio${group.groupId}"-->
-<!--								th:checked="${group.projectDefinitionStatus == 'pending'}" />-->
-<!--							<label-->
-<!--								for="rejectRadio${group.groupId}">Reject</label>-->
-
-<!--							&lt;!&ndash; Add hidden input for groupId &ndash;&gt;-->
-<!--							<input type="hidden" name="groupId" th:value="${group.groupId}" />-->
-
-<!--							<button type="submit" class="btn btn-primary"-->
-<!--								onclick="return confirm('Are you sure ?')">Submit</button>-->
-<!--						</form>-->
-
-<!--					</td>-->
 					<td>
 						<form action="/bisag/guide/guide_pending_def_approvals/ans" method="post" class="status-form">
 							<div class="radio-group">
@@ -261,11 +295,56 @@ tr.hover-element th div.dropdown .rounded button.btn-primary:hover {
 
 				</tr>
 
-				<!-- ... Your existing HTML code ... -->
 
 			</tbody>
 		</table>
 
+		<form th:action="@{/bisag/guide/approveDefinition}" method="post">
+
+			<div class="form-container">
+			<h2>Approve or Reject Project Definition</h2>
+
+			<!-- Display Error Message if Group Not Found -->
+			<div th:if="${error}" class="error-message">
+				<p th:text="${error}"></p>
+			</div>
+
+			<div class="table-container">
+				<table>
+					<thead>
+					<tr>
+						<th>Group ID</th>
+						<th>Project Definition</th>
+						<th>Description</th>
+						<th>Action</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr th:each="group : ${groups}" th:if="${group.projectDefinitionStatus == 'gpending'}">
+						<td th:text="${group.groupId}"></td>
+						<td th:text="${group.projectDefinition}"></td>
+						<td th:text="${group.description}"></td>
+						<td>
+							<form th:action="@{/bisag/guide/approveDefinition}" method="post">
+								<input type="hidden" name="groupId" th:value="${group.groupId}" />
+
+								<!-- Status Dropdown -->
+								<select name="status">
+									<option value="Approved">Approve</option>
+									<option value="Rejected">Reject</option>
+								</select>
+
+								<!-- Submit Button -->
+								<button type="submit" onclick="return confirm('Are you sure you want to proceed?')">Submit</button>
+							</form>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+
+		</div>
+	</form>
 
 		<!-- Include the footer fragment -->
 		<div th:replace="fragments/footerFragment :: footer"></div>

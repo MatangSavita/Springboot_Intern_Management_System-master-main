@@ -104,6 +104,13 @@ public class Intern {
     @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", nullable = true)
     private LocalDateTime updatedAt;
 
+    @Column(name = "admin_updated", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", nullable = true)
+    private LocalDateTime adminUpdated;
+
+    @Column(nullable = false , columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean guideApproved = false;
+
+
     @Column(name = "cancellation_status")
     private String cancellationStatus;
 
@@ -122,6 +129,7 @@ public class Intern {
     @ManyToOne
     private GroupEntity group;
 
+
     public Intern() {
         super();
     }
@@ -130,7 +138,7 @@ public class Intern {
                   String collegeName, String branch, byte[] collegeIcardImage, byte[] nocPdf, byte[] resumePdf, int semester,
                   String permanentAddress, Date dateOfBirth, String gender, String collegeGuideHodName, String degree, Double aggregatePercentage, String projectDefinitionName, String cancellationStatus,
                   Guide guide, String domain, Date joiningDate, Date completionDate, String password, byte[] icardForm, byte[] registrationForm, byte[] securityForm,
-                  String usedResource, LocalDateTime createdAt, LocalDateTime updatedAt, GroupEntity group, boolean isActive) {
+                  String usedResource, LocalDateTime createdAt, LocalDateTime updatedAt,  GroupEntity group, boolean isActive , LocalDateTime adminUpdated , boolean guideApproved) {
         super();
         this.internId = internId;
         this.firstName = firstName;
@@ -163,7 +171,9 @@ public class Intern {
         this.cancellationStatus = cancellationStatus;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.adminUpdated = adminUpdated;
         this.group = group;
+        this.guideApproved = guideApproved;
     }
 
     public Intern(String firstName, String lastName, String contactNo, String email, String collegeName, Date joiningDate, Date completionDate,
@@ -186,6 +196,7 @@ public class Intern {
         this.password = password;
         this.domain = domain;
         this.group = group;
+
     }
 
     public byte[] getPassportSizeImage() {
@@ -461,12 +472,27 @@ public class Intern {
         this.profilePicture = profilePicture;
     }
 
+    public LocalDateTime getAdminUpdated(){
+        return adminUpdated;
+    }
+
+
+    public void setAdminUpdated(LocalDateTime adminUpdated){
+        this.adminUpdated = adminUpdated;
+    }
+
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        adminUpdated = LocalDateTime.now();
+
     }
+
 
     public Object getGroupEntity() {
         return group;
     }
+
+
 }

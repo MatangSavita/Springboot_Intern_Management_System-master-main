@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "weekly_report")
-public class WeeklyReport {
+public class WeeklyReport{
 	
 		@Id
 		@GeneratedValue(strategy = GenerationType.IDENTITY)

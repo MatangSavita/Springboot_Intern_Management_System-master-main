@@ -3,16 +3,9 @@ package com.rh4.entities;
 import java.util.Date;
 import java.util.List;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -69,6 +62,9 @@ public class Guide {
 	@OneToMany(mappedBy = "guide")
 	private List<GroupEntity> groups;
 
+
+	private String definitionStatus="pending";
+
 	public List<GroupEntity> getGroups() {
 		return groups;
 	}
@@ -82,12 +78,12 @@ public class Guide {
 	}
 
 	public Guide(long guideId,
-			@NotNull @Size(min = 2, max = 20) @Pattern(regexp = "^[a-zA-Z ]+$", message = "Only characters are allowed") String name,
-			@NotNull @Size(min = 2, max = 20) @Pattern(regexp = "^[a-zA-Z ]+$", message = "Only characters are allowed") String location,
-			@NotNull @Digits(integer = 10, fraction = 0, message = "Contact number must be a numeric value with up to 10 digits") long floor,
-			@NotNull @Digits(integer = 10, fraction = 0, message = "Contact number must be a numeric value with up to 10 digits") long labNo,
-			@NotNull @Digits(integer = 10, fraction = 0, message = "Contact number must be a numeric value with up to 10 digits") long contactNo,
-			@Email String emailId, Date createdAt, String password) {
+				 @NotNull @Size(min = 2, max = 20) @Pattern(regexp = "^[a-zA-Z ]+$", message = "Only characters are allowed") String name,
+				 @NotNull @Size(min = 2, max = 20) @Pattern(regexp = "^[a-zA-Z ]+$", message = "Only characters are allowed") String location,
+				 @NotNull @Digits(integer = 10, fraction = 0, message = "Contact number must be a numeric value with up to 10 digits") long floor,
+				 @NotNull @Digits(integer = 10, fraction = 0, message = "Contact number must be a numeric value with up to 10 digits") long labNo,
+				 @NotNull @Digits(integer = 10, fraction = 0, message = "Contact number must be a numeric value with up to 10 digits") long contactNo,
+				 @Email String emailId, Date createdAt, String password , String definitionStatus) {
 		super();
 		this.guideId = guideId;
 		this.name = name;
@@ -98,6 +94,7 @@ public class Guide {
 		this.emailId = emailId;
 		this.createdAt = createdAt;
 		this.password = password;
+		this.definitionStatus = definitionStatus;
 	}
 
 	public long getGuideId() {
@@ -171,5 +168,12 @@ public class Guide {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	public String getDefinitionStatus() {
+		return definitionStatus;
+	}
+	public void setDefinitionStatus(String definitionStatus) {
+		this.definitionStatus = definitionStatus;
+	}
+
 
 }

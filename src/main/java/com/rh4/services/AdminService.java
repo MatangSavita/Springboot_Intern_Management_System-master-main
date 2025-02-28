@@ -33,7 +33,7 @@ public class AdminService {
 		return new BCryptPasswordEncoder();
 	}
 
-	public void registerAdmin(Admin admin) {
+	public void registerAdmin(	Admin admin) {
 		// save to admin table
 		String encryptedPassword = passwordEncoder().encode(admin.getPassword());
 		admin.setPassword(encryptedPassword);

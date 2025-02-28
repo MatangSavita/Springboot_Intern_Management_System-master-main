@@ -2,6 +2,8 @@ package com.rh4.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.rh4.entities.Intern;
+import com.rh4.repositories.InternRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -133,5 +135,6 @@ public class GuideService {
 		user.setPassword(encryptedPassword);
 		userRepo.save(user);
 	}
-	
+
+
 }

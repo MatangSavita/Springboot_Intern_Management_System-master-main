@@ -133,12 +133,14 @@ tr.hover-element th div.dropdown .rounded button.btn-primary:hover {
 						th:value="${group != null ? group.projectDefinition : ''}" /></td>
 					<td><input type="text" name="description"
 						th:value="${group != null ? group.description : ''}" /></td>
-
-					<td><a
-						th:href="@{'/files/projectDefinitionDocument/' + ${group.projectDefinitionDocument}}"
-						target="_blank"> Open Document </a></td>
-
-					<td><input type="radio" name="apendingAns" value="approve"
+					<td>
+						<a th:href="@{/bisag/admin/viewProjectDefinition/{groupId}(groupId=${group.groupId})}"
+						   target="_blank" >
+							Open Document
+						</a>
+					</td>
+					<td>
+						<input type="radio" name="apendingAns" value="approve"
 						id="approveRadio${group.groupId}"
 						th:checked="${group.projectDefinitionStatus == 'approved'}" /> <label
 						for="approveRadio${group.groupId}">Approve</label> <input
@@ -150,8 +152,9 @@ tr.hover-element th div.dropdown .rounded button.btn-primary:hover {
 						<button type="submit" class="btn btn-primary"
 							onclick="return confirm('Are you sure ?')">Submit</button></td>
 					</form>
-				</tr>
 
+				</tr>
+				<!-- Row for Updating Definitions -->
 				<!-- ... Your existing HTML code ... -->
 
 			</tbody>
@@ -160,6 +163,7 @@ tr.hover-element th div.dropdown .rounded button.btn-primary:hover {
 		<!-- Include the footer fragment -->
 		<div th:replace="fragments/footerFragment :: footer"></div>
 	</main>
+
 	<!-- End #main -->
 
 	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
