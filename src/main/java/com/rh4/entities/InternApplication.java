@@ -19,28 +19,26 @@ public class InternApplication {
     private long id;
 
     @Column(name = "first_name")
-    @NotBlank(message = "First name is required.")
     private String firstName;
 
     @Column(name = "last_name")
-    @NotBlank(message = "Last name is required.")
     private String lastName;
 
     @Column(name = "contact_number", unique = true)
-    @Pattern(regexp = "\\d{10}", message = "Contact number must be exactly 10 digits \r\n")
+    @Pattern(regexp = "\\d{10}", message = "Contact number must be exactly 10 digits")
     private String contactNo;
 
     @Column(name = "email_id", unique = true)
-    @NotBlank(message = "Email is required.")
-    @Email(message = "Invalid email format.")
     private String email;
 
     @Column(name = "college_name")
-    @NotBlank(message = "College name is required.")
     private String collegeName;
 
-    @Column(name = "branch_name")
-    private String branch;
+//    @Column(name = "branch_name")
+//    private String branch;
+
+    private String guideName;
+    private Long guideId;
 
     @Lob
     @Column(name = "passport_size_image", columnDefinition = "LONGBLOB")
@@ -59,13 +57,13 @@ public class InternApplication {
     private byte[] resumePdf;
 
     @Column(name = "semester")
-    @Min(value = 1, message = "Semester must be at least 1.")
+    @Min(value = 1, message = "Semester must be at least 1")
     @Max(value = 8, message = "Semester must be at most 8")
     private int semester;
 
     @Column(name = "password")
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$",
-            message = "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.\r\n")
+            message = "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.")
     private String password;
 
     @Column(name = "degree")
@@ -84,10 +82,10 @@ public class InternApplication {
     private Date joiningDate;
 
     @Column(name = "completion_date")
-    @Future(message = "Completion date must be in the future ")
+    @Future(message = "Completion date must be in the future")
     private Date completionDate;
 
-    @AssertTrue(message = "Completion date must be after joining date \r\n")
+    @AssertTrue(message = "Completion date must be after joining date")
     private boolean isCompletionDateAfterJoiningDate() {
         return completionDate == null || completionDate.after(joiningDate);
     }
@@ -109,8 +107,33 @@ public class InternApplication {
         createdAt = LocalDateTime.now();
     }
 
+    @Column(nullable = false)
+    private String securityPin; // Hashed 6-digit pin
+
+
+    private String guideStatus = "pending"; // Default status
+    private String adminStatus = "pending"; // Default status
+
+
     public long getId() {
         // TODO Auto-generated method stub
-        return id;
+        return id;  // changes-----------------------------------------------
     }
+
+    public String getGuideStatus() {
+        return guideStatus;
+    }
+
+    public void setGuideStatus(String guideStatus) {
+        this.guideStatus = guideStatus;
+    }
+
+    public String getAdminStatus() {
+        return adminStatus;
+    }
+
+    public void setAdminStatus(String adminStatus) {
+        this.adminStatus = adminStatus;
+    }
+
 }
