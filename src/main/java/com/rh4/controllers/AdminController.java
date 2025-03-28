@@ -2296,6 +2296,83 @@ public String internApplicationSubmission(@RequestParam long id, InternApplicati
     //==========================================  end update definition by guide and approve by admin==========================================================//
 
 
+    
+
+    @GetMapping("/final_approval_by_admin")
+    public ModelAndView finalapprovedInterns(Model model) {
+        ModelAndView mv = new ModelAndView();
+
+        // Get the logged-in guide's username from session
+        String username = (String) session.getAttribute("username");
+        Admin admin = adminService.getAdminByUsername(username);
+
+        if (admin != null) {
+            long adminId = admin.getAdminId();
+
+            List<InternApplication> intern = internService.getInternApplication();
+
+            mv.addObject("intern", intern);
+            session.setAttribute("id", adminId);
+
+            logService.saveLog(String.valueOf(adminId),
+                    "View Shortlisted Intern Applications",
+                    "Guide " + admin.getName() + " accessed the shortlisted intern applications page.");
+        } else {
+            System.out.println("Error: admin not found for logging!");
+            mv.addObject("interns", List.of());
+        }
+
+        mv.setViewName("admin/final_approval_by_admin");
+        return mv;
+    }
+
+
+
+//    @PostMapping("/final_approval_by_admin/ans")
+//    public String finalInternApplicationSubmission(@RequestParam String message, @RequestParam long id,
+//                                              @RequestParam String status, @RequestParam String finalStatus) {
+//        System.out.println("id: " + id + ", status: " + status);
+//
+//        Optional<InternApplication> intern = internService.getInternApplication(id);
+//
+//        if (intern.isPresent()) {
+//            intern.get().setStatus(status);
+//            intern.get().setFinalStatus(finalStatus);
+//            internService.addInternApplication(intern.get());
+//
+//            logService.saveLog(String.valueOf(id), "Updated application status for intern", "Status Change");
+//
+//            if (status.equals("rejected")) {
+//            } else {
+//            }
+//        }
+//        return "redirect:/bisag/admin/final_approval_by_admin";
+//    }
+
+    @PostMapping("/final_approval_by_admin/ans")
+    public String finalInternApplicationSubmission(@RequestParam long id, @RequestParam String status) {
+        Optional<InternApplication> internOpt = internService.getInternApplication(id);
+
+        if (internOpt.isPresent()) {
+            InternApplication intern = internOpt.get();
+            intern.setAdminStatus(status);
+
+            // Only update finalStatus if guide has already approved
+            if ("passed".equals(status) && "passed".equals(intern.getGuideStatus())) {
+                intern.setFinalStatus("passed");
+            } else
+            {
+                intern.setFinalStatus("pending");
+            }
+
+            internService.addInternApplication(intern);
+            logService.saveLog(String.valueOf(id), "Admin approved/rejected intern", "Status Change");
+        }
+
+        return "redirect:/bisag/admin/final_approval_by_admin";
+    }
+
+    
 }
 
 
