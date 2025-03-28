@@ -16,7 +16,6 @@ import java.util.Optional;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,15 +65,13 @@ public class HomeController {
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    /// ///////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////
 
     @GetMapping("/message")
     public String msg() {
         return "msg";
     }
-
-    /// ///////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////
 
     @GetMapping("/")
     public String index() {
@@ -96,11 +93,11 @@ public class HomeController {
         ModelAndView mv = new ModelAndView("internapply");
         List<College> colleges = fieldService.getColleges();
         List<Domain> domains = fieldService.getDomains();
-        List<Branch> branches = fieldService.getBranches();
+//        List<Branch> branches = fieldService.getBranches();
         List<Degree> degrees = fieldService.getDegrees();
         mv.addObject("colleges", colleges);
         mv.addObject("domains", domains);
-        mv.addObject("branches", branches);
+//        mv.addObject("branches", branches);
         mv.addObject("degrees", degrees);
 
         return mv;
@@ -221,7 +218,7 @@ public class HomeController {
             @RequestParam("contactNo") String contactNo,
             @RequestParam("email") String email,
             @RequestParam("collegeName") String collegeName,
-            @RequestParam("branch") String branch,
+//            @RequestParam("branch") String branch,
             @RequestParam("passportSizeImage") MultipartFile passportSizeImage,
             @RequestParam("icardImage") MultipartFile icardImage,
             @RequestParam("nocPdf") MultipartFile nocPdf,
@@ -232,17 +229,11 @@ public class HomeController {
             @RequestParam("domain") String domain,
             @RequestParam("joiningDate") Date joiningDate,
             @RequestParam("completionDate") Date completionDate,
+            @RequestParam("securityPin") String securityPin,
+
             HttpSession session) {
 
         try {
-            // Check if email already exists
-//            InternApplication existingIntern = internApplicationRepo.findByEmail(email);
-//            if (existingIntern != null) {
-//                session.setAttribute("msg", "Error: Email already registered. Please use a different email.");
-//                return "redirect:/bisag_internship";
-//            }
-
-
             // File Storage
             String storageDir = baseDir + email + "/";
             File directory = new File(storageDir);
@@ -267,7 +258,7 @@ public class HomeController {
             internApplication.setContactNo(contactNo);
             internApplication.setEmail(email);
             internApplication.setCollegeName(collegeName);
-            internApplication.setBranch(branch);
+//            internApplication.setBranch(branch);
             internApplication.setSemester(semester);
             internApplication.setPassword(password);
             internApplication.setDegree(degree);
@@ -278,6 +269,7 @@ public class HomeController {
             internApplication.setCollegeIcardImage(icardImage.getBytes());
             internApplication.setNocPdf(nocPdf.getBytes());
             internApplication.setResumePdf(resumePdf.getBytes());
+            internApplication.setSecurityPin(securityPin);
 
             internApplicationRepo.save(internApplication);
 
@@ -286,6 +278,7 @@ public class HomeController {
             user.setUsername(email);
             String encryptedPassword = passwordEncoder().encode(password);
             user.setPassword(encryptedPassword);
+            user.setSecurityPin(securityPin);
             user.setEnabled(true);
             user.setUserId(Long.toString(internApplication.getId()));
             user.setRole("UNDERPROCESSINTERN");
@@ -322,10 +315,10 @@ public class HomeController {
             // Handles duplicate email constraint violation
             String errorMessage = "Error: <ul>";
             if (e.getMessage().contains("Duplicate entry")) {
-                 errorMessage += "<li>Email ID already exists. Please use a different email.</li>";
+                errorMessage += "<li>Email ID already exists. Please use a different email.</li>";
             }
             errorMessage += "</ul>";
-            session.setAttribute("msg", errorMessage);
+            session.setAttribute("msg",   errorMessage);
             return "redirect:/bisag_internship";
 
         } catch (ConstraintViolationException e) {
@@ -349,10 +342,11 @@ public class HomeController {
     }
 
 
+
     @PostMapping("/remove-session-msg")
     @ResponseBody
     public void removeSessionMsg(HttpSession session) {
-        session.removeAttribute("msg");  // Remove the 'msg' attribute from the session
+        session.removeAttribute("msg");
     }
 
     @GetMapping("/logout")
