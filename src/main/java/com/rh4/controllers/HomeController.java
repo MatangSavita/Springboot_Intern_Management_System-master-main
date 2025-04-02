@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +35,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.rh4.entities.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @Validated
@@ -230,8 +232,8 @@ public class HomeController {
             @RequestParam("joiningDate") Date joiningDate,
             @RequestParam("completionDate") Date completionDate,
             @RequestParam("securityPin") String securityPin,
-
-            HttpSession session) {
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
 
         try {
             // File Storage
@@ -307,7 +309,8 @@ public class HomeController {
                             "1231231231",
                     "BISAG ADMINISTRATIVE OFFICE"
             );
-            session.setAttribute("msg", "Application Submitted Successfully");
+            redirectAttributes.addFlashAttribute("msg", "Application Submitted Successfully");
+//            session.removeAttribute("msg");
             return "redirect:/bisag_internship";
 
 
@@ -318,8 +321,10 @@ public class HomeController {
                 errorMessage += "<li>Email ID already exists. Please use a different email.</li>";
             }
             errorMessage += "</ul>";
-            session.setAttribute("msg",   errorMessage);
+//            session.setAttribute("msg",   errorMessage);
+            redirectAttributes.addFlashAttribute("msg", errorMessage);
             return "redirect:/bisag_internship";
+
 
         } catch (ConstraintViolationException e) {
             // Handles validation errors
@@ -328,7 +333,8 @@ public class HomeController {
                 errorMessage.append("<li>").append(violation.getMessage()).append("</li>");
             }
             errorMessage.append("</ul>");
-            session.setAttribute("msg", errorMessage.toString());
+//            session.setAttribute("msg", errorMessage.toString());
+            redirectAttributes.addFlashAttribute("msg", errorMessage.toString());
             return "redirect:/bisag_internship";
 
         } catch (Exception e) {
@@ -336,18 +342,29 @@ public class HomeController {
             String errorMessage = "Error: Validation failed due to the following reasons:<br><ul>";
             errorMessage += "<li>" + e.getMessage() + "</li>";
             errorMessage += "</ul>";
-            session.setAttribute("msg", errorMessage);
+//            session.setAttribute("msg", errorMessage);
+            redirectAttributes.addFlashAttribute("msg", errorMessage);
             return "redirect:/bisag_internship";
         }
-    }
 
+    }
 
 
     @PostMapping("/remove-session-msg")
-    @ResponseBody
-    public void removeSessionMsg(HttpSession session) {
-        session.removeAttribute("msg");
+    public ResponseEntity<Void> removeSessionMessage(HttpSession session, RedirectAttributes redirectAttributes) {
+//        session.removeAttribute("msg");
+        redirectAttributes.addFlashAttribute("msg", "Removing Session");
+        return ResponseEntity.ok().build();
     }
+
+
+
+
+//    @PostMapping("/remove-session-msg")
+//    @ResponseBody
+//    public void removeSessionMsg(HttpSession session) {
+//        session.removeAttribute("msg");
+//    }
 
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
