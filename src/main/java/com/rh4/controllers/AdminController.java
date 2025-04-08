@@ -1669,29 +1669,39 @@ public String internApplicationSubmission(@RequestParam long id, InternApplicati
         return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
     }
 
-
-
-
-    @GetMapping("/cancellation_requests")
-    public ModelAndView cancellationRequests(Model model) {
-        ModelAndView mv = new ModelAndView("/admin/cancellation_requests");
-        List<Intern> requestedInterns = internService.getInternsByCancellationStatus("requested");
-        model = countNotifications(model);
-        // Add the list of requested interns to the ModelAndView
-        mv.addObject("requestedInterns", requestedInterns);
-        mv.addObject("admin", adminName(session));
-
-        return mv;
+//------------------------intern cancellation request---------------------
+    @GetMapping("/intern_cancellation_request")
+    public String viewFinalApprovals(Model model) {
+        List<Intern> reviewedByGuide = internService.getInternsByCancellationStatusList(
+                Arrays.asList("gapproved", "grejected"));
+        model.addAttribute("guideReviewedList", reviewedByGuide);
+        return "admin/intern_cancellation_request";
     }
 
-    @PostMapping("/cancellation_requests/ans")
-    public String pendingCancellationsFromAdmin(@RequestParam("cancelAns") String cancelAns,
-                                                @RequestParam("internId") String internId) {
+    @PostMapping("/finalApproveCancellation")
+    public String finalApproveCancellation(@RequestParam String internId) {
+        Intern intern = internService.getInternById(internId);
+        intern.setCancellationStatus("cancelled"); // final status
+        internService.updateCancellationStatus(intern);
 
-        adminService.cancelIntern(cancelAns, internId);
+        logService.saveLog(intern.getInternId(), "Admin Approved Cancellation",
+                "Admin approved cancellation request for intern.");
 
-        return "redirect:/bisag/admin/cancellation_requests";
+        return "redirect:/bisag/admin/intern_cancellation_request";
     }
+
+    @PostMapping("/finalRejectCancellation")
+    public String finalRejectCancellation(@RequestParam String internId) {
+        Intern intern = internService.getInternById(internId);
+        intern.setCancellationStatus("arejected"); // or use "rejected" based on your logic
+        internService.updateCancellationStatus(intern);
+
+        logService.saveLog(intern.getInternId(), "Admin Rejected Cancellation",
+                "Admin rejected cancellation request for intern.");
+
+        return "redirect:/bisag/admin/intern_cancellation_request";
+    }
+
 
     @GetMapping("/query_to_guide")
     public ModelAndView queryToGuide(Model model) {
