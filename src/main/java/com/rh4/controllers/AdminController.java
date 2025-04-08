@@ -2254,52 +2254,73 @@ public String internApplicationSubmission(@RequestParam long id, InternApplicati
     //========================================== end update definition by admin===================================================================//
 
 
-    //========================================== update definition by guide and approve by admin==========================================================//
-
-
+      //----------approve or reject  definition which is updated by guide manually---------------------///// 
     @GetMapping("/update_def_ans")
     public String showPendingProjectDefinitions(Model model) {
         // Fetch all groups where project definition status is "pending"
-        List<GroupEntity> pendingGroups = groupRepo.findByProjectDefinitionStatus("pending");
+        List<GroupEntity> pendingGroups = groupRepo.findByProjectDefinitionStatus("gupending");
 
         // Add the fetched groups to the model
         model.addAttribute("groups", pendingGroups);
 
-        // If no pending definitions, add an error message
-        if (pendingGroups.isEmpty()) {
-            model.addAttribute("error", "No pending project definitions found!");
-        }
-
         return "admin/update_def_ans"; // Return Thymeleaf template
     }
 
+
     @PostMapping("/update_def_ans")
-    public String updateProjectDefinition(@RequestParam String groupId,
-                                          @RequestParam String status,
-                                          RedirectAttributes redirectAttributes) {
-        GroupEntity group = groupRepo.getByGroupId(groupId);
+    public String updateProjectDefinitionFromAdmin(@PathVariable("groupId") String groupId,
+                                                   @RequestParam("status") String status,
+                                                   @RequestParam("projectDefinition") String projectDefinition,
+                                                   @RequestParam("description") String description,
+                                                   HttpSession session,
+                                                   RedirectAttributes redirectAttributes) {
+        GroupEntity group = groupService.getGroup(groupId);
 
         if (group == null) {
             redirectAttributes.addFlashAttribute("error", "Group not found.");
             return "redirect:/bisag/admin/update_def_ans";
         }
 
-        if (!"pending".equals(group.getProjectDefinitionStatus())) {
-            redirectAttributes.addFlashAttribute("error", "Project definition is not pending approval.");
+        group.setProjectDefinition(projectDefinition);
+        group.setDescription(description);
+
+        if ("approved".equalsIgnoreCase(status)) {
+            group.setProjectDefinitionStatus("approved");
+
+            List<Intern> interns = internService.getInternsByGroupId(group.getId());
+            for (Intern intern : interns) {
+                intern.setProjectDefinitionName(group.getProjectDefinition());
+                internRepo.save(intern);
+            }
+
+            // Logging action
+            String username = (String) session.getAttribute("username");
+            Admin admin = adminService.getAdminByUsername(username);
+            if (admin != null) {
+                logService.saveLog(String.valueOf(admin.getAdminId()), "Project Definition Approved",
+                        "Admin " + admin.getName() + " approved project definition for group ID: " + groupId);
+            }
+
+            redirectAttributes.addFlashAttribute("success", "Project Definition approved.");
+
+        } else if ("rejected".equalsIgnoreCase(status)) {
+            group.setProjectDefinitionStatus("rejected");
+
+            // Optional: Add log for rejection
+            String username = (String) session.getAttribute("username");
+            Admin admin = adminService.getAdminByUsername(username);
+            if (admin != null) {
+                logService.saveLog(String.valueOf(admin.getAdminId()), "Project Definition Rejected",
+                        "Admin " + admin.getName() + " rejected project definition for group ID: " + groupId);
+            }
+
+            redirectAttributes.addFlashAttribute("success", "Project Definition rejected.");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Invalid status.");
             return "redirect:/bisag/admin/update_def_ans";
         }
 
-        if (!status.equalsIgnoreCase("approved") && !status.equalsIgnoreCase("rejected")) {
-            redirectAttributes.addFlashAttribute("error", "Invalid status. Use 'approved' or 'rejected'.");
-            return "redirect:/bisag/admin/update_def_ans";
-        }
-
-        // Update status and save
-        group.setProjectDefinitionStatus(status.toLowerCase());
         groupRepo.save(group);
-
-        // Redirect with success message
-        redirectAttributes.addFlashAttribute("success", "Project Definition " + status + ".");
         return "redirect:/bisag/admin/update_def_ans";
     }
 
