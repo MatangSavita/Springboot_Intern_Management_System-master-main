@@ -56,16 +56,26 @@
                         th:href="@{/bisag/admin/intern_application/approved_interns}"><i
                         class="bi bi-circle"></i><span>Shortlisted Intern
 							Applications</span></a></li>
+                <li><a
+                        th:href="@{/bisag/admin/final_approval_by_admin}"><i
+                        class="bi bi-circle"></i><span>Final Approval List
+							Applications</span></a></li>
                 <li><a th:href="@{/bisag/admin/intern_application/new_interns}"><i
                         class="bi bi-circle"></i><span>Approved Interns</span></a></li>
+                <li><a th:href="@{/bisag/admin/logs}"><i
+                        class="bi bi-circle"></i><span>Rejected Interns</span></a></li>
+                <li><a th:href="@{/bisag/admin/generate_credentials}">
+                    <i class="bi bi-circle"></i><span>Generate Credentials</span></a></li>
                 <li><a th:href="@{/bisag/admin/add_fields}"><i
                         class="bi bi-circle"></i><span>Add Fields</span></a></li>
-                <li><a th:href="@{/bisag/admin/cancellation_requests}"><i
+                <li><a th:href="@{/bisag/admin/undertaking}"><i
+                        class="bi bi-circle"></i><span>Add Undertaking</span></a></li>
+                <li><a th:href="@{/bisag/admin/intern_cancellation_request}"><i
                         class="bi bi-circle"></i><span>Cancellation Requests</span></a></li>
-                <li><a th:href="@{/bisag/admin/manage_leave_applications}"><i
-                        class="bi bi-circle"></i><span>Manage Leave Applications</span></a></li>
                 <li><a th:href="@{/bisag/admin/feedback_form_list}"><i
-                        class="bi bi-circle"></i><span>feedback form list</span></a></li>
+                        class="bi bi-circle"></i><span>Feedback Applications</span></a></li>
+                <li><a th:href="@{/bisag/admin/announcement}">
+                    <i class="bi bi-circle"></i><span>Announcement Board</span></a></li>
 
             </ul>
 
@@ -111,7 +121,7 @@
                     <ul id="preject-def-nav" class="nav-content collapse "
                         data-bs-parent="#admin-nav">
                         <li><a th:href="@{/bisag/admin/admin_pending_def_approvals}">
-                            <i class="bi bi-circle"></i><span>Pending Definitions </span>
+                            <i class="bi bi-circle"></i><span>Pending Definitions</span>
                         </a></li>
                         <li><a th:href="@{/bisag/admin/update_project_def}">
                             <i class="bi bi-circle"></i><span>Update Definitions </span>
@@ -119,9 +129,7 @@
                         <li><a th:href="@{/bisag/admin/update_def_ans}">
                             <i class="bi bi-circle"></i><span>Pending Update Definitions </span>
                         </a></li>
-
                     </ul>
-
                 </li>
             </ul>
 
@@ -136,13 +144,21 @@
                         <li><a th:href="@{/bisag/admin/admin_weekly_report}"> <i
                                 class="bi bi-circle"></i><span>All Weekly Reports</span>
                         </a></li>
+                        <li><a th:href="@{/bisag/admin/weekly-reports/pending}"> <i
+                                class="bi bi-circle"></i><span>Pending Weekly Reports</span>
+                        </a></li>
+                        <li><a th:href="@{/bisag/admin/admin_weekly_report_form}">
+                            <i class="bi bi-circle"></i><span>Add Report</span>
+                        </a>
+                        </li>
                         <li><a th:href="@{/bisag/admin/admin_pending_final_reports}">
                             <i class="bi bi-circle"></i><span>Final Reports</span>
                         </a></li>
-<!--                        <li><a th:href="@{/bisag/admin/admin_yearly_report}">-->
-<!--                            <i class="bi bi-circle"></i><span>All Yearly Report</span>-->
-<!--                        </a></li>-->
                     </ul>
+
+
+
+
                 </li>
             </ul>
 
@@ -150,13 +166,13 @@
                 <li class="nav-item">
                     <a class="nav-link collapsed" data-bs-target="#thesis-nav" data-bs-toggle="collapse" href="#">
                         <i class="bi bi-menu-button-wide"></i>
-                        <span>Thesis</span>
+                        <span>Thesis Issue Management</span>
                         <i class="bi bi-chevron-down ms-auto"></i>
                     </a>
                     <ul id="thesis-nav" class="nav-content collapse" data-bs-parent="#def-nav">
                         <li>
                             <a th:href="@{/bisag/admin/thesis/new}">
-                                <i class="bi bi-circle"></i><span>Thesis</span>
+                                <i class="bi bi-circle"></i><span>Thesis Issue</span>
                             </a>
                         </li>
                         <li>
@@ -167,70 +183,163 @@
                     </ul>
                 </li>
             </ul>
+
+            <ul class="sidebar-nav" id="def-nav">
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#log-nav" data-bs-toggle="collapse" href="#">
+                        <i class="bi bi-menu-button-wide"></i>
+                        <span>Logs</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="log-nav" class="nav-content collapse" data-bs-parent="#def-nav">
+                        <li>
+                            <a th:href="@{/bisag/admin/activity_logs}">
+                                <i class="bi bi-circle"></i><span>Log Data</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="sidebar-nav" id="def-nav">
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#verification-nav" data-bs-toggle="collapse" href="#">
+                        <i class="bi bi-menu-button-wide"></i>
+                        <span>Intern Verification</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="verification-nav" class="nav-content collapse" data-bs-parent="#def-nav">
+                        <li>
+                            <a th:href="@{/bisag/admin/verification_request_form}">
+                                <i class="bi bi-circle"></i><span>Verification Request</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul id="verification-nav" class="nav-content collapse" data-bs-parent="#def-nav">
+                        <li>
+                            <a th:href="@{/bisag/admin/verification_requests}">
+                                <i class="bi bi-circle"></i><span>Pending Verification</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul id="verification-nav" class="nav-content collapse" data-bs-parent="#def-nav">
+                        <li>
+                            <a th:href="@{/bisag/admin/approved-verifications}">
+                                <i class="bi bi-circle"></i><span>Approved Verification</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul id="verification-nav" class="nav-content collapse" data-bs-parent="#def-nav">
+                        <li>
+                            <a th:href="@{/bisag/admin/rejected-verifications}">
+                                <i class="bi bi-circle"></i><span>Rejected Verification</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="sidebar-nav" id="def-nav">
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#attendance-nav" data-bs-toggle="collapse" href="#">
+                        <i class="bi bi-menu-button-wide"></i>
+                        <span>Attendance</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="attendance-nav" class="nav-content collapse" data-bs-parent="#def-nav">
+                        <li>
+                            <a th:href="@{/bisag/admin/attendance}">
+                                <i class="bi bi-circle"></i><span>Attendance Data</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="sidebar-nav" id="def-nav">
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#records-nav" data-bs-toggle="collapse" href="#">
+                        <i class="bi bi-menu-button-wide"></i>
+                        <span>Records</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="records-nav" class="nav-content collapse" data-bs-parent="#def-nav">
+                        <li>
+                            <a th:href="@{/bisag/admin/ask_records}">
+                                <i class="bi bi-circle"></i><span>Record Form</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul id="records-nav" class="nav-content collapse" data-bs-parent="#def-nav">
+                        <li>
+                            <a th:href="@{/bisag/admin/relieving_records_list}">
+                                <i class="bi bi-circle"></i><span>Records List</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="sidebar-nav" id="def-nav">
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#leave-nav" data-bs-toggle="collapse" href="#">
+                        <i class="bi bi-menu-button-wide"></i>
+                        <span>Leave Application</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="leave-nav" class="nav-content collapse" data-bs-parent="#def-nav">
+                        <li>
+                            <a th:href="@{/bisag/admin/pending_leaves}">
+                                <i class="bi bi-circle"></i><span>Pending Applications</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul id="leave-nav" class="nav-content collapse" data-bs-parent="#def-nav">
+                        <li>
+                            <a th:href="@{/bisag/admin/leave_history}">
+                                <i class="bi bi-circle"></i><span>Leave History</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="sidebar-nav" id="def-nav">
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#thesiss-nav" data-bs-toggle="collapse" href="#">
+                        <i class="bi bi-menu-button-wide"></i>
+                        <span>Thesis Storage</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="thesiss-nav" class="nav-content collapse" data-bs-parent="#def-nav">
+                        <li>
+                            <a th:href="@{/bisag/admin/thesis-storage}">
+                                <i class="bi bi-circle"></i><span>Store Thesis</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="sidebar-nav" id="def-nav">
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#tasks-nav" data-bs-toggle="collapse" href="#">
+                        <i class="bi bi-menu-button-wide"></i>
+                        <span>Task Assignment</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="tasks-nav" class="nav-content collapse" data-bs-parent="#def-nav">
+                        <li>
+                            <a th:href="@{/bisag/admin/tasks_assignments}">
+                                <i class="bi bi-circle"></i><span>Task Management</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
         </li>
     </ul>
-
-
-    <ul class="sidebar-nav" id="def-nav">
-        <li class="nav-item">
-            <a class="nav-link collapsed" data-bs-target="#verification-nav" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-menu-button-wide"></i>
-                <span>Verification</span>
-                <i class="bi bi-chevron-down ms-auto"></i>
-            </a>
-            <ul id="verification-nav" class="nav-content collapse" data-bs-parent="#def-nav">
-                <li>
-                    <a th:href="@{/bisag/admin/verification_request_form}">
-                        <i class="bi bi-circle"></i><span>Verification Request</span>
-                    </a>
-                </li>
-            </ul>
-            <ul id="verification-nav" class="nav-content collapse" data-bs-parent="#def-nav">
-                <li>
-                    <a th:href="@{/bisag/admin/verification_requests}">
-                        <i class="bi bi-circle"></i><span>Pending Verification</span>
-                    </a>
-                </li>
-            </ul>
-            <ul id="verification-nav" class="nav-content collapse" data-bs-parent="#def-nav">
-                <li>
-                    <a th:href="@{/bisag/admin/approved_verifications}">
-                        <i class="bi bi-circle"></i><span>Approved Verification</span>
-                    </a>
-                </li>
-            </ul>
-            <ul id="verification-nav" class="nav-content collapse" data-bs-parent="#def-nav">
-                <li>
-                    <a th:href="@{/bisag/admin/rejected_verifications}">
-                        <i class="bi bi-circle"></i><span>Rejected Verification</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
-    </ul>
-
-<!-- Annoucement Board-->
-
-    <ul class="sidebar-nav" id="def-nav">
-        <li class="nav-item">
-            <a class="nav-link collapsed" data-bs-target="#announcement-nav" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-menu-button-wide"></i>
-                <span>Annoucement</span>
-                <i class="bi bi-chevron-down ms-auto"></i>
-            </a>
-            <ul id="announcement-nav" class="nav-content collapse" data-bs-parent="#def-nav">
-                <li>
-                    <a th:href="@{/bisag/admin/announcement}">
-                        <i class="bi bi-circle"></i><span>Annoucement Board</span>
-                    </a>
-                </li>
-            </ul>
-
-        </li>
-    </ul>
-
-
-
 
     <!-- Vendor JS Files -->
     <script th:src="@{/assets/vendor/apexcharts/apexcharts.min.js}"></script>
