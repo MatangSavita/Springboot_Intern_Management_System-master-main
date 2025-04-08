@@ -1030,4 +1030,36 @@ public class GuideController {
         headers.setContentType(MediaType.APPLICATION_PDF);
         return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
     }
+
+       
+//    show the cancellations requests
+
+    @GetMapping("/intern_request")
+    public String viewCancellationRequests(Model model) {
+        List<Intern> cancellationRequests = internService.getInternsByCancellationStatus("requested");
+        model.addAttribute("cancellationRequests", cancellationRequests);
+        return "guide/intern_request"; // your Thymeleaf template
+    }
+
+        
+    @PostMapping("/handleCancellation")
+    public String handleCancellation(@RequestParam String internId,
+                                     @RequestParam String action) {
+        Intern intern = internService.getInternById(internId);
+    
+        if ("approve".equalsIgnoreCase(action)) {
+            intern.setCancellationStatus("gapproved");
+            logService.saveLog(intern.getInternId(),
+                    "Guide Approved Cancellation",
+                    "Guide approved intern cancellation.");
+        } else if ("reject".equalsIgnoreCase(action)) {
+            intern.setCancellationStatus("grejected");
+            logService.saveLog(intern.getInternId(),
+                    "Guide Rejected Cancellation",
+                    "Guide rejected intern cancellation.");
+        }
+        internService.updateCancellationStatus(intern);
+        return "redirect:/bisag/guide/intern_request";
+    }
+    
 }
