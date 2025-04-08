@@ -3,53 +3,58 @@
 
 	<!-- Vendor CSS Files -->
 	<link rel="stylesheet"
-		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-		integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-		crossorigin="anonymous" referrerpolicy="no-referrer" />
+		  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+		  integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+		  crossorigin="anonymous" referrerpolicy="no-referrer" />
 	<link th:href="@{/assets/vendor/bootstrap/css/bootstrap.min.css}"
-		rel="stylesheet" type="text/css">
+		  rel="stylesheet" type="text/css">
 	<link th:href="@{/assets/vendor/bootstrap-icons/bootstrap-icons.css}"
-		rel="stylesheet" type="text/css">
+		  rel="stylesheet" type="text/css">
 	<link th:href="@{/assets/vendor/remixicon/remixicon.css}"
-		rel="stylesheet" type="text/css">
+		  rel="stylesheet" type="text/css">
 	<link th:href="@{/assets/vendor/simple-datatables/style.css}"
-		rel="stylesheet" type="text/css">
+		  rel="stylesheet" type="text/css">
 
 	<!-- Template Main CSS File -->
 	<link th:href="@{/assets/css/style.css}" rel="stylesheet"
-		type="text/css">
+		  type="text/css">
 	<style>
-.lgout {
-	padding: 10px;
-	list-style-type: none;
-	border: 2px solid;
-	border-radius: 10px;
-}
-</style>
+		.lgout {
+			padding: 10px;
+			list-style-type: none;
+			border: 2px solid;
+			border-radius: 10px;
+		}
+	</style>
 
 
 
 
 	<ul class="sidebar-nav" id="interns-nav">
 		<li class="nav-item"><a class="nav-link "
-			th:href="@{/bisag/guide/guide_dashboard}"> <i class="bi bi-grid"></i>
-				<span>Profile</span>
+								th:href="@{/bisag/guide/guide_dashboard}"> <i class="bi bi-grid"></i>
+			<span>Profile</span>
 		</a></li>
 	</ul>
-	
+
 	<ul class="sidebar-nav" id="interns-nav">
 		<li class="nav-item"><a class="nav-link "
-			th:href="@{/bisag/guide/query_to_admin}"> <i class="bi bi-chat-dots"></i>
-				<span>Queries</span>
+								th:href="@{/bisag/guide/query_to_admin}"> <i class="bi bi-chat-dots"></i>
+			<span>Queries</span>
 		</a></li>
 	</ul>
 
 	<ul class="sidebar-nav" id="guide-nav">
 		<li class="nav-item"><a class="nav-link collapsed"
-			data-bs-target="#guide-components-nav" data-bs-toggle="collapse"
-			href="#"> <i class="bi bi-menu-button-wide"></i><span>Intern
-					Groups</span><i class="bi bi-chevron-down ms-auto"></i>
+								data-bs-target="#guide-components-nav" data-bs-toggle="collapse"
+								href="#"> <i class="bi bi-menu-button-wide"></i><span>Intern
+					</span><i class="bi bi-chevron-down ms-auto"></i>
 		</a>
+			<ul id="guide-components-nav" class="nav-content collapse "
+				data-bs-parent="#guide-nav">
+				<li><a th:href="@{/bisag/guide/approved_interns}"><i
+						class="bi bi-circle"></i><span>Shortlisted Intern Application</span></a></li>
+			</ul>
 			<ul id="guide-components-nav" class="nav-content collapse "
 				data-bs-parent="#guide-nav">
 				<li><a th:href="@{/bisag/guide/intern_groups}"><i
@@ -58,52 +63,76 @@
 
 			<ul class="sidebar-nav" id="def-nav">
 				<li class="nav-item"><a class="nav-link collapsed"
-					data-bs-target="#weekly-report-nav" data-bs-toggle="collapse"
-					href="#"> <i class="bi bi-menu-button-wide"></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
+										data-bs-target="#weekly-report-nav" data-bs-toggle="collapse"
+										href="#"> <i class="bi bi-menu-button-wide"></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
 				</a>
 					<ul id="weekly-report-nav" class="nav-content collapse"
 						data-bs-parent="#weekly-report-nav">
-						<li><a th:href="@{/bisag/guide/weekly_report}">
-							<i
+						<li><a th:href="@{/bisag/guide/weekly_report}"> <i
 								class="bi bi-circle"></i><span>Weekly Reports</span>
-						</a>
-						</li>
-						<li><a th:href="@{/bisag/guide/guide_pending_final_reports}">
-							<i
+						</a></li>
+						<li><a th:href="@{/bisag/guide/guide_pending_final_reports}"> <i
 								class="bi bi-circle"></i><span>Final Reports</span>
 						</a></li>
-
-
+						<li><a th:href="@{/bisag/guide/intern_request}"> <i
+								class="bi bi-circle"></i><span>Cancellation Request</span>
+						</a></li>
 					</ul>
 				</li>
 			</ul>
 
 			<ul class="sidebar-nav" id="def-nav">
 				<li class="nav-item"><a class="nav-link collapsed"
-					data-bs-target="#preject-def-nav" data-bs-toggle="collapse"
-					href="#"> <i class="bi bi-menu-button-wide"></i><span>Project
+										data-bs-target="#preject-def-nav" data-bs-toggle="collapse"
+										href="#"> <i class="bi bi-menu-button-wide"></i><span>Project
 							Definition</span><i class="bi bi-chevron-down ms-auto"></i>
 				</a>
 					<ul id="preject-def-nav" class="nav-content collapse "
 						data-bs-parent="#guide-nav">
 						<li><a th:href="@{/bisag/guide/guide_pending_def_approvals}">
-								<i class="bi bi-circle"></i><span>Pending Definitions</span>
+							<i class="bi bi-circle"></i><span>Pending Definitions</span>
 						</a></li>
 						<li><a th:href="@{/bisag/guide/create_project_def}">
 							<i class="bi bi-circle"></i><span>Update Definition</span>
 						</a></li>
-					</ul>
-				</li>
+					</ul></li>
+			</ul>
 
+			<ul class="sidebar-nav" id="def-nav">
+				<li class="nav-item"><a class="nav-link collapsed"
+										data-bs-target="#leave-def-nav" data-bs-toggle="collapse"
+										href="#"> <i class="bi bi-menu-button-wide"></i><span>Leave Application</span><i class="bi bi-chevron-down ms-auto"></i>
+				</a>
+					<ul id="leave-def-nav" class="nav-content collapse "
+						data-bs-parent="#guide-nav">
+						<li><a th:href="@{/bisag/guide/pending_leaves}">
+							<i class="bi bi-circle"></i><span>Pending Applications</span>
+						</a></li>
+					</ul></li>
+			</ul>
 
-			</ul> <!-- Vendor JS Files --> <script
-				th:src="@{/assets/vendor/apexcharts/apexcharts.min.js}"></script> <script
-				th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+			<ul class="sidebar-nav" id="def-nav">
+				<li class="nav-item"><a class="nav-link collapsed"
+										data-bs-target="#tasks-def-nav" data-bs-toggle="collapse"
+										href="#"> <i class="bi bi-menu-button-wide"></i><span>Task Assignment</span><i class="bi bi-chevron-down ms-auto"></i>
+				</a>
+					<ul id="tasks-def-nav" class="nav-content collapse "
+						data-bs-parent="#guide-nav">
+						<li><a th:href="@{/bisag/guide/tasks_assignments}">
+							<i class="bi bi-circle"></i><span>Task Management</span>
+						</a></li>
+					</ul></li>
+			</ul>
+			<!-- Vendor JS Files --> <script
+					th:src="@{/assets/vendor/apexcharts/apexcharts.min.js}"></script> <script
+					th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
 			<script th:src="@{/assets/vendor/chart.js/chart.umd.js}"></script> <script
-				th:src="@{/assets/vendor/echarts/echarts.min.js}"></script> <script
-				th:src="@{/assets/vendor/quill/quill.min.js}"></script> <script
-				th:src="@{/assets/vendor/simple-datatables/simple-datatables.js}"></script>
+					th:src="@{/assets/vendor/echarts/echarts.min.js}"></script> <script
+					th:src="@{/assets/vendor/quill/quill.min.js}"></script> <script
+					th:src="@{/assets/vendor/simple-datatables/simple-datatables.js}"></script>
 			<script th:src="@{/assets/vendor/tinymce/tinymce.min.js}"></script> <script
-				th:src="@{/assets/vendor/php-email-form/validate.js}"></script> <!-- Template Main JS File -->
+					th:src="@{/assets/vendor/php-email-form/validate.js}"></script> <!-- Template Main JS File -->
 			<script th:src="@{/assets/js/main.js}"></script>
+		</li>
+	</ul>
 </aside>
