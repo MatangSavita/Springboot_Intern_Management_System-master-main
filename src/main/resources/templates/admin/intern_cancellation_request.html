@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>IMS Admin Panel</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <style>
+        .form-container {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .hover-element:hover {
+            cursor: pointer; /* Change cursor to pointer on hover */
+        }
+
+        /* Style for the dropdown container */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Style for the dropdown button */
+        .dropdown button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Style for the dropdown content (hidden by default) */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        /* Style for each dropdown item */
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* Show the dropdown content when the dropdown button is hovered over */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Exclude hover effect for elements with "exclude-hover" class */
+        tr.hover-element th div.dropdown .rounded button.btn-primary:hover {
+            background-color: transparent; /* or any other styling you want */
+            color: inherit; /* or any other styling you want */
+        }
+
+        .lgout {
+            padding: 10px;
+            list-style-type: none;
+            border: 2px solid;
+            border-radius: 10px;
+        }
+
+        .table th {
+            cursor: pointer;
+            background-image: url('default-icon.png'); /* Default icon image */
+            background-size: 16px 16px; /* Adjust the size of the icon */
+            background-repeat: no-repeat;
+            background-position: right center;
+            /* Position the icon to the right center */
+            padding-right: 20px; /* Add some padding to accommodate the icon */
+        }
+    </style>
+</head>
+
+<body>
+
+
+<!-- Include the header fragment -->
+<div th:replace="fragments/headerFragment :: header"></div>
+
+<!-- Include the aside fragment -->
+<div th:replace="fragments/asideFragment :: aside"></div>
+
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Pending Project Definitions</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Project
+                    Definition</a></li>
+                <li class="breadcrumb-item active">Pending Project Definitions</li>
+            </ol>
+        </nav>
+    </div>
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+<!--                <input type="text" class="mb-4 form-control" id="searchInput" placeholder="Search...">-->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Pending Cancellation Requests</h5>
+                        <!-- Table with stripped rows -->
+                        <table class="table datatable table-bordered">
+                            <thead>
+                            <tr>
+                                <th><i class="fa-solid fa-sort mx-2"></i>ID</th>
+                                <th><i class="fa-solid fa-sort mx-2"></i>Name</th>
+                                <th><i class="fa-solid fa-sort mx-2"></i>Group</th>
+                                <th><i class="fa-solid fa-sort mx-2"></i>Email</th>
+                                <th><i class="fa-solid fa-sort mx-2"></i>Contact</th>
+                                <th><i class="fa-solid fa-sort mx-2"></i>College</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="intern : ${guideReviewedList}"
+                                th:if="${intern.isActive}"
+                                th:classappend="${intern.cancellationStatus == 'guide_approved'} ? 'table-success' : 'table-danger'">
+
+                            <td>
+                                    <a th:href="@{'/bisag/admin/intern/' + ${intern.internId}}">
+                                        <span th:text="${intern.internId}"></span>
+                                    </a>
+                                </td>
+                                <td th:text="${intern.firstName} + ' '"></td>
+                                <td th:text="${intern.group.groupId}"></td>
+                                <td th:text="${intern.email}"></td>
+                                <td th:text="${intern.contactNo}"></td>
+                                <td th:text="${intern.collegeName}"></td>
+                                <td>
+                                    <!-- Show guide decision -->
+                                    <span th:if="${intern.cancellationStatus == 'guide_approved'}" class="badge bg-success">Guide Approved</span>
+                                    <span th:if="${intern.cancellationStatus == 'guide_rejected'}" class="badge bg-danger">Guide Rejected</span>
+                                    <br><br>
+
+                                    <!-- Admin Actions -->
+                                    <form th:action="@{/bisag/admin/finalApproveCancellation}" method="post" style="display:inline;">
+                                        <input type="hidden" name="internId" th:value="${intern.internId}" />
+                                        <button type="submit" class="btn btn-success btn-sm mb-1"
+                                                onclick="return confirm('Are you sure to approve?')">Approve</button>
+                                    </form>
+                                    <form th:action="@{/bisag/admin/finalRejectCancellation}" method="post" style="display:inline;">
+                                        <input type="hidden" name="internId" th:value="${intern.internId}" />
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Are you sure to reject?')">Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                        <!-- End Table with stripped rows -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Include the footer fragment -->
+    <div th:replace="fragments/footerFragment :: footer"></div>
+</main>
+
+<!-- End #main -->
+
+</body>
+
+</html>
