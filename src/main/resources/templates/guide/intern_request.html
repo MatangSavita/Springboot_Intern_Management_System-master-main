@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>IMS Guide Panel</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <style>
+
+        /*css for definition provided by admin*/
+
+        .form-container {
+            width: 60%;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px #ccc;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+        .form-container label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        .form-container select, .form-container input {
+            width: 50%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .form-container button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+        .table-container {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+
+        /*css for definition provided by admin*/
+
+
+        .form-container {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .hover-element:hover {
+            cursor: pointer; /* Change cursor to pointer on hover */
+        }
+
+        /* Style for the dropdown container */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Style for the dropdown button */
+        .dropdown button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Style for the dropdown content (hidden by default) */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        /* Style for each dropdown item */
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* Show the dropdown content when the dropdown button is hovered over */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Exclude hover effect for elements with "exclude-hover" class */
+        tr.hover-element th div.dropdown .rounded button.btn-primary:hover {
+            background-color: transparent; /* or any other styling you want */
+            color: inherit; /* or any other styling you want */
+        }
+
+        .lgout {
+            padding: 10px;
+            list-style-type: none;
+            border: 2px solid;
+            border-radius: 10px;
+        }
+        /*self write below css*/
+
+        /* Style the form container */
+        .approval-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        /* Style each radio group */
+        .radio-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Style radio inputs */
+        .radio-input {
+            display: none; /* Hide the default radio buttons */
+        }
+
+        /* Style radio labels */
+        .radio-label {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        /* Approve label specific styling */
+        .radio-label.approve {
+            color: #28a745; /* Green */
+            border-color: #28a745;
+        }
+
+        /* Reject label specific styling */
+        .radio-label.reject {
+            color: #dc3545; /* Red */
+            border-color: #dc3545;
+        }
+
+        /* Add hover effect */
+        .radio-label:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Style selected radio buttons */
+        .radio-input:checked + .radio-label {
+            background-color: #e0f7e9; /* Light green for approve */
+            border-color: #28a745; /* Match approve border */
+            color: #fff; /* White text */
+        }
+
+        .radio-input:checked + .radio-label.reject {
+            background-color: #fde0e0; /* Light red for reject */
+            border-color: #dc3545; /* Match reject border */
+        }
+
+        .status-form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Align items to the start of the column */
+            gap: 0.5rem; /* Add space between each element */
+        }
+
+        /* Optional: Style the button for consistency */
+        .btn {
+            margin-top: 0.5rem; /* Add space above the button */
+            width: 100%; /* Make the button take full width */
+            text-align: center; /* Center the text inside the button */
+        }
+
+        /* Optional: Style the radio groups */
+        .radio-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem; /* Add space between the radio button and its label */
+        }
+
+
+    </style>
+</head>
+
+<body>
+
+
+<!-- Include the header fragment -->
+<div th:replace="fragments/guideHeaderFragment :: header"></div>
+
+<!-- Include the aside fragment -->
+<div th:replace="fragments/guideAsideFragment :: aside"></div>
+
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Pending Project Definitions</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Intern Request</a></li>
+                <li class="breadcrumb-item active">Intern Request for Application</li>
+            </ol>
+        </nav>
+    </div>
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+                <!--                <input type="text" class="mb-4 form-control" id="searchInput" placeholder="Search...">-->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Pending Cancellation Requests</h5>
+                        <!-- Table with stripped rows -->
+                        <table class="table datatable table-bordered">
+                            <thead>
+                            <tr>
+                                <th><i class="fa-solid fa-sort mx-2"></i>ID</th>
+                                <th><i class="fa-solid fa-sort mx-2"></i>Name</th>
+                                <th><i class="fa-solid fa-sort mx-2"></i>Group</th>
+                                <th><i class="fa-solid fa-sort mx-2"></i>Email</th>
+                                <th><i class="fa-solid fa-sort mx-2"></i>Contact</th>
+                                <th><i class="fa-solid fa-sort mx-2"></i>College</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="intern : ${cancellationRequests}" th:if="${intern.isActive}">
+                                <td>
+                                    <a th:href="@{'/bisag/admin/intern/' + ${intern.internId}}">
+                                        <span th:text="${intern.internId}"></span>
+                                    </a>
+                                </td>
+                                <td th:text="${intern.firstName} + ' '"></td>
+                                <td th:text="${intern.group.groupId}"></td>
+                                <td th:text="${intern.email}"></td>
+                                <td th:text="${intern.contactNo}"></td>
+                                <td th:text="${intern.collegeName}"></td>
+                                <td>
+                                    <!-- Show guide decision -->
+                                    <form th:action="@{/bisag/guide/handleCancellation}" method="post">
+                                        <input type="hidden" name="internId" th:value="${intern.internId}" />
+                                        <button type="submit" name="action" value="approve" class="btn btn-success btn-sm"
+                                                onclick="return confirm('Approve this request?')">Approve</button>
+                                                <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm"
+                                                        onclick="return confirm('Reject this request?')">Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                        <!-- End Table with stripped rows -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!--    <table>-->
+<!--        &lt;!&ndash; Table showing cancellation requests &ndash;&gt;-->
+<!--        <tr th:each="intern : ${cancellationRequests}">-->
+<!--            <td th:text="${intern.firstName}"></td>-->
+<!--            <td>-->
+<!--                <form th:action="@{/bisag/guide/handleCancellation}" method="post">-->
+<!--                    <input type="hidden" name="internId" th:value="${intern.internId}" />-->
+<!--                    <button type="submit" name="action" value="approve" class="btn btn-success btn-sm"-->
+<!--                            onclick="return confirm('Approve this request?')">Approve</button>-->
+<!--                    <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm"-->
+<!--                            onclick="return confirm('Reject this request?')">Reject</button>-->
+<!--                </form>-->
+
+<!--            </td>-->
+<!--        </tr>-->
+<!--    </table>-->
+
+    <!-- Include the footer fragment -->
+    <div th:replace="fragments/footerFragment :: footer"></div>
+</main>
+<!-- End #main -->
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script
+        src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
