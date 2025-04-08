@@ -74,9 +74,6 @@
 						<li><a th:href="@{/bisag/guide/guide_pending_final_reports}"> <i
 								class="bi bi-circle"></i><span>Final Reports</span>
 						</a></li>
-						<li><a th:href="@{/bisag/guide/intern_request}"> <i
-								class="bi bi-circle"></i><span>Cancellation Request</span>
-						</a></li>
 					</ul>
 				</li>
 			</ul>
@@ -111,6 +108,8 @@
 					</ul></li>
 			</ul>
 
+
+
 			<ul class="sidebar-nav" id="def-nav">
 				<li class="nav-item"><a class="nav-link collapsed"
 										data-bs-target="#tasks-def-nav" data-bs-toggle="collapse"
@@ -123,6 +122,21 @@
 						</a></li>
 					</ul></li>
 			</ul>
+
+			<ul class="sidebar-nav" id="def-nav">
+				<li class="nav-item"><a class="nav-link collapsed"
+										data-bs-target="#req-intern-nav" data-bs-toggle="collapse"
+										href="#"> <i class="bi bi-menu-button-wide"></i><span>Intern Request</span><i class="bi bi-chevron-down ms-auto"></i>
+				</a>
+					<ul id="req-intern-nav" class="nav-content collapse "
+						data-bs-parent="#guide-nav">
+						<li><a th:href="@{/bisag/guide/intern_request}"> <i
+								class="bi bi-circle"></i><span>Cancellation Request</span>
+						</a></li>
+					</ul></li>
+			</ul>
+
+
 			<!-- Vendor JS Files --> <script
 					th:src="@{/assets/vendor/apexcharts/apexcharts.min.js}"></script> <script
 					th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
