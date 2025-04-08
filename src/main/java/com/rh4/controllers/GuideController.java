@@ -950,7 +950,7 @@ public class GuideController {
         String oldStatus = group.getProjectDefinitionStatus();
         group.setProjectDefinition(projectDefinition);
         group.setDescription(description);
-        group.setProjectDefinitionStatus("pending");
+        group.setProjectDefinitionStatus("gupending");
         groupRepo.save(group);
 
         Guide guide = getSignedInGuide();
