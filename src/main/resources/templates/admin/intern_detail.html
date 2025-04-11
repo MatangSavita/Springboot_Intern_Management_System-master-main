@@ -65,12 +65,17 @@
 
 <main id="main" class="main">
 	<div class="pagetitle">
-		<h1>Intern Details<span th:text="${' - ' + intern.get().firstName + ' ' + intern.get().lastName}"></span></h1>
+		<h1>Intern Details<span th:text="${' - ' + intern.get().firstName + ' '}"></span></h1>
 	</div>
 	<div th:if="${intern.isPresent()}">
 
+<!--		<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">-->
+<!--			Intern details updated successfully!-->
+<!--			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">OK</button>-->
+<!--		</div>-->
+
 		<form action="update" method="post" class="needs-validation"
-			  enctype="multipart/form-data">
+			  enctype="multipart/form-data" onsubmit="return confirmUpdate()">
 			<table class="table table-bordered">
 				<tr>
 					<th>Intern ID</th>
@@ -82,11 +87,11 @@
 					<td><input type="text" name="firstName"
 							   th:value="${intern.get().firstName}" class="no-border"></td>
 				</tr>
-				<tr>
-					<th>Last Name</th>
-					<td><input type="text" name="lastName"
-							   th:value="${intern.get().lastName}" class="no-border"></td>
-				</tr>
+<!--				<tr>-->
+<!--					<th>Last Name</th>-->
+<!--					<td><input type="text" name="lastName"-->
+<!--							   th:value="${intern.get().lastName}" class="no-border"></td>-->
+<!--				</tr>-->
 				<tr>
 					<th>Contact No</th>
 					<td><input type="text" name="contactNo"
@@ -245,7 +250,7 @@
 			</table>
 
 			<div class="text-center mb-3">
-				<button id="mysubmitbutton1" type="submit" class="btn btn-success">Update
+				<button id="mysubmitbutton1" type="submit" class="btn btn-success" >Update
 				</button>
 				<button id="mysubmitbutton2" type="submit">
 					<a th:href="@{/bisag/admin/intern_application/new_interns}"
@@ -254,6 +259,12 @@
 			</div>
 		</form>
 	</div>
+
+	<script>
+		function confirmUpdate() {
+			return alert("Are you sure you want to update intern details?");
+		}
+	</script>
 
 	<div th:unless="${intern.isPresent()}">
 		<!-- Handle the case when Optional is empty -->
