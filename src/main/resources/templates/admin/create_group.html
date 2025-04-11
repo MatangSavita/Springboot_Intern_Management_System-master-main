@@ -118,7 +118,7 @@
 					<div class="card-body">
 						<h5 class="card-title">Pending Group Creation</h5>
 						<form th:action="create_group_details" method="post"
-							  id="createGroupForm">
+							  id="createGroupForm" onsubmit="return confirmCreateGroup()">
 							<!-- Table with stripped rows -->
 							<table class="table datatable table-bordered">
 								<thead>
@@ -126,7 +126,7 @@
 									<th><i class="fa-solid fa-sort mx-2"></i>Select</th>
 									<th><i class="fa-solid fa-sort mx-2"></i>Intern ID</th>
 									<th><i class="fa-solid fa-sort mx-2"></i>First Name</th>
-									<th><i class="fa-solid fa-sort mx-2"></i>Last Name</th>
+<!--									<th><i class="fa-solid fa-sort mx-2"></i>Last Name</th>-->
 									<th><i class="fa-solid fa-sort mx-2"></i>Domain</th>
 									<th>Action</th>
 									<!-- Add more columns as needed -->
@@ -142,7 +142,7 @@
 											th:href="@{'/bisag/admin/intern_application/' + ${intern.id}}"><span
 											th:text="${intern.id}"></span></a></td>
 									<td th:text="${intern.firstName}"></td>
-									<td th:text="${intern.lastName}"></td>
+<!--									<td th:text="${intern.lastName}"></td>-->
 									<td th:text="${intern.domain}"
 										data-domain="${intern.domain}"></td>
 									<td><a
@@ -171,6 +171,21 @@
 <!-- End #main -->
 
 
+<!--//alert box-->
+<!--<script>-->
+<!--	function confirmCreateGroup() {-->
+<!--		// This will show a confirmation dialog box-->
+<!--		var isConfirmed = alert("Are you sure you want to create the group for selected interns?");-->
+<!--		if (isConfirmed) {-->
+<!--			// If confirmed, return true to submit the form-->
+<!--			return true;-->
+<!--		} else {-->
+<!--			// If cancelled, prevent form submission-->
+<!--			return false;-->
+<!--		}-->
+<!--	}-->
+<!--</script>-->
+
 <script th:inline="javascript">
 	/*<![CDATA[*/
 	var internData = /*[[${interns}]]*/[];
@@ -178,36 +193,39 @@
 </script>
 <script>
 	function checkDomainAndSubmit() {
-		// Use the internData variable to get the data dynamically
 		var checkboxes = document.getElementsByName("selectedInterns");
 		var uniqueDomains = new Set();
+		var selectedCount = 0;
 
 		checkboxes.forEach(function(checkbox) {
-			var row = checkbox.closest("tr");
-			var internId = checkbox.value;
-
-			// Find the intern in internData based on the id
-			var intern = internData.find(function(data) {
-				return data.id == internId;
-			});
-
-			if (intern) {
-				var internDomain = intern.domain;
-
-				if (checkbox.checked) {
-					uniqueDomains.add(internDomain);
-				}
+			if (checkbox.checked) {
+				var row = checkbox.closest("tr");
+				var domain = row.querySelector('[data-domain]').getAttribute('data-domain');
+				uniqueDomains.add(domain);
+				selectedCount++;
 			}
 		});
+
+		if (selectedCount === 0) {
+			alert("Please select at least one intern.");
+			return false;
+		}
 
 		if (uniqueDomains.size > 1) {
 			alert("Selected interns must have the same domain for group creation.");
 			return false;
-		} else {
+		}
+
+		// Show confirmation before submitting
+		let confirmCreate = confirm("Are you sure you want to create the group?");
+		if (confirmCreate) {
 			document.getElementById("createGroupForm").submit();
 			return true;
+		} else {
+			return false;
 		}
 	}
+
 </script>
 <script
 		src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
