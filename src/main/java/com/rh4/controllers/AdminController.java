@@ -1672,8 +1672,7 @@ public String internApplicationSubmission(@RequestParam long id, InternApplicati
 //------------------------intern cancellation request---------------------
     @GetMapping("/intern_cancellation_request")
     public String viewFinalApprovals(Model model) {
-        List<Intern> reviewedByGuide = internService.getInternsByCancellationStatusList(
-                Arrays.asList("gapproved", "grejected"));
+        List<Intern> reviewedByGuide = internService.getInternsByCancellationStatus("gapproved");
         model.addAttribute("guideReviewedList", reviewedByGuide);
         return "admin/intern_cancellation_request";
     }
