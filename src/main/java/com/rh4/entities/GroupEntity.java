@@ -31,6 +31,10 @@ public class GroupEntity {
 	@Column(name = "final_report_status")
 	private String finalReportStatus = "pending";
 
+	@Column(name = "admin_final_report_status")
+	private String adminFinalReportStatus = "pending"; // New Field: Admin Approval Status
+
+
 	@Lob
 	@Column(name = "project_definition_document", columnDefinition = "LONGBLOB")
 	private byte[] projectDefinitionDocument;
@@ -51,7 +55,7 @@ public class GroupEntity {
 		}
   	
 	public GroupEntity(long id, String groupId, String projectDefinition, String description, byte[] finalReport, String finalReportStatus,
-		String projectDefinitionStatus, byte[] projectDefinitionDocument, String domain, Guide guide, String projectUpdateDefinitionStatus) {
+		String projectDefinitionStatus, byte[] projectDefinitionDocument, String domain, Guide guide, String projectUpdateDefinitionStatus , String adminFinalReportStatus) {
 	super();
 	this.id = id;
 	this.groupId = groupId;
@@ -64,6 +68,8 @@ public class GroupEntity {
 	this.projectDefinitionDocument = projectDefinitionDocument;
 	this.guide = guide;
 	this.projectUpdateDefinitionStatus = projectUpdateDefinitionStatus;
+	this.adminFinalReportStatus = adminFinalReportStatus;
+
 }
 	public String getFinalReportStatus() {
 		return finalReportStatus;
@@ -154,4 +160,13 @@ public class GroupEntity {
 	public void setProjectDefinitionDocument(byte[] projectDefinitionDocument) {
 		this.projectDefinitionDocument = projectDefinitionDocument;
 	}
+
+	public void setAdminFinalReportStatus(String adminFinalReportStatus) {
+	   this.adminFinalReportStatus = adminFinalReportStatus;
+	}
+
+	public String getAdminFinalReportStatus() {
+	   return adminFinalReportStatus;
+	}
+
 }
