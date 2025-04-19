@@ -17,17 +17,20 @@ public class GroupService {
 	@Autowired
 	private GuideService guideService;
 
-	public String getMostRecentGroupId() {
+	public String getMostRecentGroupId()
+	{
 		GroupEntity mostRecentGroup = groupRepo.findTopByOrderByGroupIdDesc();
 		return mostRecentGroup != null ? mostRecentGroup.getGroupId() : null;
 	}
 
-	public void registerGroup(GroupEntity group) {
+	public void registerGroup(GroupEntity group)
+	{
 		groupRepo.save(group);
 		System.out.println("GRP: " + group.getId());
 	}
 
-	public List<GroupEntity> getGuideNotAllocatedGroup() {
+	public List<GroupEntity> getGuideNotAllocatedGroup()
+	{
 		return groupRepo.getGroupEntityNoGuide();
 	}
 
@@ -61,10 +64,6 @@ public class GroupService {
 		groupRepo.save(group);
 	}
 
-//	public List<GroupEntity> getGroupsByGuideId(String guideId) {
-//		return GroupRepo.findByGuideId(guideId);
-//	}
-
 	public List<GroupEntity> getGPendingGroups(Guide guide) {
 		return groupRepo.findByGuideAndProjectDefinitionStatus(guide, "gpending");
 	}
@@ -87,7 +86,30 @@ public class GroupService {
 		return groupRepo.findByGuideAndFinalReportStatus(guide, "gpending");
 	}
 
-	public List<GroupEntity> getAPendingFinalReports() {
-		return groupRepo.findByFinalReportStatus("gapproved");
+
+	// Get reports waiting for Admin approval
+//	public List<GroupEntity> getAdminPendingFinalReports() {
+//		return groupRepo.findByAdminFinalReportStatus("pending"); // This should now work as expected
+//	}
+
+//
+	public List<GroupEntity> getAdminPendingFinalReportsStatus() {
+		return groupRepo.findByAdminFinalReportStatus("pending");
 	}
+
+	public List<GroupEntity> getAPendingFinalReports() {
+		return groupRepo.findByFinalReportStatus("pending");
+	}
+
+	// Get reports waiting for Admin approval (only guide-approved ones)
+	public List<GroupEntity> getAdminPendingFinalReports() {
+		return groupRepo.findByFinalReportStatusAndAdminFinalReportStatus("gapproved", "pending");
+	}
+
+
+	public GroupEntity getGroupById(Long groupId) {
+		return groupRepo.findById(groupId).orElse(null);
+	}
+
+
 }
