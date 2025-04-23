@@ -58,7 +58,7 @@ public class InternApplication {
 
     @Column(name = "semester")
     @Min(value = 1, message = "Semester must be at least 1")
-    @Max(value = 8, message = "Semester must be at most 8")
+    @Max(value = 15, message = "Semester must be at most 15")
     private int semester;
 
     @Column(name = "password")
