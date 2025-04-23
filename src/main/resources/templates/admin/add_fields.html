@@ -18,7 +18,36 @@
 .no-border {
 	border: none;
 }
+
+ .modal-overlay {
+	 display: none;
+	 position: fixed;
+	 top: 0; left: 0;
+	 width: 100%; height: 100%;
+	 background: rgba(0,0,0,0.5);
+	 justify-content: center;
+	 align-items: center;
+	 z-index: 9999;
+ }
+
+.modal-box {
+	background: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	width: 300px;
+	text-align: center;
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+.modal-actions {
+	margin-top: 15px;
+	display: flex;
+	justify-content: space-around;
+}
 </style>
+
+
+
 </head>
 <body>
 
@@ -43,13 +72,13 @@
 			<li class="nav-item"><a class="nav-link active" id="tab1"
 				href="javascript:void(0)" onclick="switchTab('form1', 'tab1')">Add
 					College</a></li>
-			<li class="nav-item"><a class="nav-link" id="tab2"
-				href="javascript:void(0)" onclick="switchTab('form2', 'tab2')">Add
-					Branch</a></li>
+<!--			<li class="nav-item"><a class="nav-link" id="tab2"-->
+<!--				href="javascript:void(0)" onclick="switchTab('form2', 'tab2')">Add-->
+<!--					Branch</a></li>-->
 			<li class="nav-item"><a class="nav-link" id="tab3"
 				href="javascript:void(0)" onclick="switchTab('form3', 'tab3')">Add
 					Domain</a></li>
-			<li class="nav-item"><a class="nav-link" id="tab3"
+			<li class="nav-item"><a class="nav-link" id="tab4"
 				href="javascript:void(0)" onclick="switchTab('form4', 'tab4')">Add
 					Degree</a></li>
 		</ul>
@@ -57,8 +86,9 @@
 		<div class="form-container active" id="form1">
 			<h2 class="mt-5">Add College</h2>
 			<div class="container mt-3 mb-5 p-5 border shadow">
-				<form action="/bisag/admin/add_college" method="post">
-					<div class="form-group">
+				<form id="collegeForm" action="/bisag/admin/add_college" method="post" >
+
+				<div class="form-group">
 						<label for="name">College Name:</label> <input type="text"
 							class="form-control" id="field1" name="name" required>
 					</div>
@@ -76,9 +106,10 @@
 						<label for="email">College Email:</label> <input type="email"
 							class="form-control" id="field4" name="email" required>
 					</div>
-					<button type="submit" class="btn btn-primary">Submit</button>
+					<button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to college?')" >Submit</button>
 				</form>
 			</div>
+
 
 			<section class="section">
 				<div class="row">
@@ -142,90 +173,98 @@
 					</div>
 				</div>
 			</section>
-
 		</div>
 
 
-		<div class="form-container" id="form2">
-			<h2 class="mt-5">Add Branch</h2>
-			<div class="container mt-3 mb-5 p-5 border shadow">
-				<form action="/bisag/admin/add_branch" method="post">
-					<div class="form-group">
-						<label for="name">Branch Name:</label> <input type="text"
-							class="form-control" id="field2" name="name">
-					</div>
-					<button type="submit" class="btn btn-primary">Submit</button>
-				</form>
-			</div>
+<!--		<div class="form-container" id="form2">-->
+<!--			<h2 class="mt-5">Add Branch</h2>-->
+<!--			<div class="container mt-3 mb-5 p-5 border shadow">-->
+<!--				<form action="/bisag/admin/add_branch" method="post">-->
+<!--					<div class="form-group">-->
+<!--						<label for="name">Branch Name:</label> <input type="text"-->
+<!--							class="form-control" id="field2" name="name">-->
+<!--					</div>-->
+<!--					<button type="submit" class="btn btn-primary">Submit</button>-->
+<!--				</form>-->
+<!--			</div>-->
 
-			<section class="section">
-				<div class="row">
-					<div class="col-lg-12">
+<!--			<section class="section">-->
+<!--				<div class="row">-->
+<!--					<div class="col-lg-12">-->
 
-						<div class="card">
-							<div class="card-body">
-								<h5 class="card-title">Datatables</h5>
-								<table>
-									class="table datatable table-bordered">
-									<thead>
-										<tr>
-											<th>Branch Name</th>
-											<th>Update</th>
-											<th>Delete</th>
-										</tr>
-									</thead>
-									<tbody>
-										<!-- Iterate over a list of colleges -->
-										<tr th:each="branch : ${branches}">
-											<form>
-												th:action="@{'/bisag/admin/update_branch/' + ${branch.branchId}}"
-												method="post">
-												<td><label>
-													<input type="text" th:value="${branch.name}"
-														name="name" class="no-border" />
-												</label></td>
+<!--						<div class="card">-->
+<!--							<div class="card-body">-->
+<!--								<h5 class="card-title">Datatables</h5>-->
+<!--								<table>-->
+<!--									class="table datatable table-bordered">-->
+<!--									<thead>-->
+<!--										<tr>-->
+<!--											<th>Branch Name</th>-->
+<!--											<th>Update</th>-->
+<!--											<th>Delete</th>-->
+<!--										</tr>-->
+<!--									</thead>-->
+<!--									<tbody>-->
+<!--										&lt;!&ndash; Iterate over a list of colleges &ndash;&gt;-->
+<!--										<tr th:each="branch : ${branches}">-->
+<!--											<form>-->
+<!--												th:action="@{'/bisag/admin/update_branch/' + ${branch.branchId}}"-->
+<!--												method="post">-->
+<!--												<td><label>-->
+<!--													<input type="text" th:value="${branch.name}"-->
+<!--														name="name" class="no-border" />-->
+<!--												</label></td>-->
 
-												<td>
-													<div class="button-container">
-														<button id="updateButton" class="btn btn-primary"
-															type="submit">Update</button>
-													</div>
-												</td>
-											</form>
+<!--												<td>-->
+<!--													<div class="button-container">-->
+<!--														<button id="updateButton" class="btn btn-primary"-->
+<!--															type="submit">Update</button>-->
+<!--													</div>-->
+<!--												</td>-->
+<!--											</form>-->
 
-											<td>
-												<div class="button-container">
-													<button id="deleteButton" class="btn btn-danger"
-														onclick="return confirm('Are you sure you want to delete this Branch ?')">
-														<a
-															th:href="@{/bisag/admin/delete_branch/{id}(id=${branch.branchId})}"
-															class="text-white">Delete</a>
-													</button>
-												</div>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-		</div>
+<!--											<td>-->
+<!--												<div class="button-container">-->
+<!--													<button id="deleteButton" class="btn btn-danger"-->
+<!--														onclick="return confirm('Are you sure you want to delete this Branch ?')">-->
+<!--														<a-->
+<!--															th:href="@{/bisag/admin/delete_branch/{id}(id=${branch.branchId})}"-->
+<!--															class="text-white">Delete</a>-->
+<!--													</button>-->
+<!--												</div>-->
+<!--											</td>-->
+<!--										</tr>-->
+<!--									</tbody>-->
+<!--								</table>-->
+<!--							</div>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			</section>-->
+<!--		</div>-->
 
 		<div class="form-container" id="form3">
 			<h2 class="mt-5">Add Domain</h2>
 			<div class="container mt-3 mb-5 p-5 border shadow">
-				<form action="/bisag/admin/add_domain" method="post">
+				<form action="/bisag/admin/add_domain" method="post" onsubmit="return confirmSubmission()">
 					<div class="form-group">
-						<label for="name">Domain Name:</label> <input type="text"
-							class="form-control" id="field3" name="name">
+						<label for="name">Domain Name:</label>
+						<input type="text" class="form-control" id="field3" name="name">
 					</div>
 					<button type="submit" class="btn btn-primary">Submit</button>
 				</form>
 			</div>
 
-			<section class="section">
+
+		<script>
+			// Confirm submission before form submission
+			function confirmSubmission() {
+				return confirm("Are you sure you want to submit this domain?");
+			}
+		</script>
+
+
+		<section class="section">
 				<div class="row">
 					<div class="col-lg-12">
 
@@ -288,9 +327,11 @@
 						<label for="name">Degree Name:</label> <input type="text"
 							class="form-control" id="field3" name="name">
 					</div>
-					<button type="submit" class="btn btn-primary">Submit</button>
+					<button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to degree?')">Submit</button>
 				</form>
 			</div>
+
+
 
 			<section class="section">
 				<div class="row">
@@ -373,5 +414,9 @@
 			$('#' + tabId).addClass('active');
 		}
 	</script>
+
+
+
+
 </body>
 </html>
