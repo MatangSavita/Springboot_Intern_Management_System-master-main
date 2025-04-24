@@ -27,6 +27,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -80,10 +81,20 @@ public class HomeController {
         return "index";
     }
 
+//    @GetMapping("/login")
+//    public String login() {
+//        return "login";
+//    }
+
     @GetMapping("/login")
-    public String login() {
+    public String login(@RequestParam(value = "error", required = false) String error,
+                        Model model) {
+        if (error != null) {
+            model.addAttribute("error", true);
+        }
         return "login";
     }
+
 
     @PostMapping("/login")
     public void login(Intern intern) {
