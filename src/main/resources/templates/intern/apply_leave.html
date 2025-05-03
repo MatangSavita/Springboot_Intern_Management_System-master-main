@@ -1,231 +1,281 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apply for Leave</title>
-<!-- Include any necessary styles or scripts -->
-<link
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-	rel="stylesheet">
-<!-- Bootstrap CSS is used for the card layout in this example -->
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Apply for Leave</title>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
-
 <body>
+<!-- Include the header fragment -->
+<div th:replace="fragments/internHeaderFragment :: header"></div>
+<!-- Include the aside fragment -->
+<div th:replace="fragments/internAsideFragment :: aside"></div>
 
-	<!-- Include the header fragment -->
-	<div th:replace="fragments/internHeaderFragment :: header"></div>
+<main id="main" class="main">
+	<section class="section dashboard">
+		<div class="container">
+			<div class="row">
 
-	<!-- Include the aside fragment -->
-	<div th:replace="fragments/internAsideFragment :: aside"></div>
-
-	<main id="main" class="main">
-
-		<section class="section dashboard">
-			<div class="container">
-				<div class="row">
-
-					<!-- Second Sales Card -->
-					<div class="col-xxl-6 col-md-6">
-						<div class="card info-card sales-card">
-
-							<div class="card-body">
-
-								<div class="d-flex align-items-center">
-									<div
-										class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-										<i class="bi bi-people"></i>
-									</div>
-									<div class="ps-3">
-										<h4>
-											<span>Your Last Leave</span>
-										</h4>
-										<h5>
-											<span class="text-success small pt-1 fw-bold">Submitted
-												on: DD/MM/YYYY - HH:MM PM</span>
-										</h5>
-										<h5>
-											<span class="text-success small pt-1 fw-bold">Subject:
-												Abc</span>
-										</h5>
-									</div>
+				<!-- Last Submitted Leave Card -->
+				<div class="col-xxl-6 col-md-6">
+					<div class="card info-card sales-card">
+						<div class="card-body">
+							<div class="d-flex align-items-center">
+								<div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+									<i class="bi bi-people"></i>
 								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- First Sales Card -->
-					<div class="col-xxl-6 col-md-6">
-						<div class="card info-card sales-card">
-
-							<div class="card-body">
-
-								<div class="d-flex align-items-center">
-									<div
-										class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-										<i class="bi bi-people"></i>
-									</div>
-									<div class="ps-3">
-										<h4>
-											<span>Your Attandance</span>
-										</h4>
-										<h5>
-											<span class="text-success small pt-1 fw-bold">95%</span>
-										</h5>
-										<h5>
-											<span class="text-success small pt-1 fw-bold">Some
-												Message</span>
-										</h5>
-									</div>
+								<div class="ps-3">
+									<h4><span>Your Last Leave</span></h4>
+									<h5>
+                                            <span class="text-success small pt-1 fw-bold">Submitted on:
+												<!--                                                <span th:text="${lastLeave != null ? #dates.format(lastLeave.submittedOn, 'dd/MM/yyyy - hh:mm a') : 'N/A'}"></span>-->
+                                            </span>
+									</h5>
+									<h5>
+                                            <span class="text-success small pt-1 fw-bold">Subject:
+												<!--                                                <span th:text="${lastLeave != null ? lastLeave.subject : 'N/A'}"></span>-->
+                                            </span>
+									</h5>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		</section>
 
-		<div class="container mt-2">
-			<div class="card">
-
-				<div class="card-header">
-					<h3 class="text-dark">Apply for Leave</h3>
-				</div>
-				<div class="card-body">
-
-					<form action="project_definition_submission" method="post"
-						enctype="multipart/form-data">
-
-						<div class="form-group">
-							<label for="internId">Intern ID:</label> <input type="text"
-								id="internId" name="internId" th:value="${intern.internId}"
-								class="form-control" readonly>
-						</div>
-
-						<div class="form-group">
-							<label for="projectDefinition">Subject:</label> <input
-								type="text" id="projectDefinition" name="projectDefinition" placeholder="Full Day Leave for XYZ Reason"
-								class="form-control" required>
-						</div>
-
-						<div class="form-group">
-							<label for="emailBody">Body:</label>
-							<textarea id="emailBody" name="emailBody" class="form-control"
-								rows="12"
-								placeholder="Respected [Recipient's Name],
-								
-[Body Paragraph 1].
-								
-[Body Paragraph 1].
-								
-[Body Paragraph 1].
-
-Your Sincerely,
-[Your Name]
-[Your Roll No]
-[Your Group ID]"></textarea>
-
-						</div>
-
-						<div class="form-group row">
-							<label for="internId" class="col-md-2 col-form-label">Duration:</label>
-							<div class="col-md-2">
-								<label for="fromDate" class="col-form-label">From:</label> <input
-									type="date" id="fromDate" name="fromDate" class="form-control"
-									required> <input type="time" id="fromTime"
-									name="fromTime" class="form-control" required>
-							</div>
-							<div class="col-md-2">
-								<label for="toDate" class="col-form-label">To:</label> <input
-									type="date" id="toDate" name="toDate" class="form-control"
-									required> <input type="time" id="toTime" name="toTime"
-									class="form-control" required>
+				<!-- Attendance Card -->
+				<div class="col-xxl-6 col-md-6">
+					<div class="card info-card sales-card">
+						<div class="card-body">
+							<div class="d-flex align-items-center">
+								<div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+									<i class="bi bi-people"></i>
+								</div>
+								<div class="ps-3">
+									<h4><span>Your Attendance</span></h4>
+									<h5>
+                                            <span class="text-success small pt-1 fw-bold"
+												  th:text="${#numbers.formatDecimal(totalAttendance, 1, 2) + '%'}">
+                                            </span>
+									</h5>
+									<h5>
+										<span class="text-success small pt-1 fw-bold">Maintain Above 80%</span>
+									</h5>
+								</div>
 							</div>
 						</div>
-
-
-
-						<div class="form-group">
-							<label for="projectDefinitionDocument" class="form-label">Proof
-								Doc (If Any):</label> <input type="file" class="form-control"
-								id="projectDefinitionDocument" name="projectDefinitionDocument">
-						</div>
-						<div class="form-group mt-5">
-							<p>
-								<span><b>Note: </b></span><span class="text-danger">"For each
-									instance of leave taken, it is mandatory to obtain a physical
-									signature on paper as part of the documentation process."</span>
-							</p>
-						</div>
-
-
-						<!-- Repeat the above block for other fields -->
-
-						<div class="form-group text-center">
-							<button type="submit" class="btn btn-primary">Submit</button>
-						</div>
-
-					</form>
-
+					</div>
 				</div>
+
 			</div>
 		</div>
+	</section>
 
-		<div class="container mt-2">
-			<div class="card">
+	<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+		<span th:text="${success}"></span>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
 
-				<div class="card-header">
-					<h3 class="text-dark">History</h3>
-				</div>
-				<div class="card-body">
-					<table class="table">
-						<thead>
-							<tr>
-								<th>Leave ID</th>
-								<th>Subject</th>
-								<th>Submitted On</th>
-								<th>From</th>
-								<th>To</th>
-								<th>Considered As</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>1</td>
-								<td>XYZ</td>
-								<td>DD/MM/YYYY</td>
-								<td>DD/MM/YYYY - HH:MM PM</td>
-								<td>DD/MM/YYYY - HH:MM PM</td>
-								<td>Half Day</td>
-							</tr>
-							<tr>
-								<td>2</td>
-								<td>ABC</td>
-								<td>DD/MM/YYYY</td>
-								<td>DD/MM/YYYY - HH:MM PM</td>
-								<td>DD/MM/YYYY - HH:MM PM</td>
-								<td>Full Day</td>
-							</tr>
-							<!-- Add more rows as needed -->
-						</tbody>
-					</table>
+	<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+		<span th:text="${error}"></span>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+	<div class="container mt-2">
+		<div class="card">
+			<div class="card-header">
+				<h3 class="text-dark">Apply for Leave</h3>
+			</div>
+			<div class="card-body">
+				<form th:action="@{/bisag/intern/submit_leave}" method="post" enctype="multipart/form-data">
+					<div class="form-group">
+						<label for="internId">Intern ID:</label>
+						<input type="text" id="internId" name="internId" th:value="${intern.internId}" class="form-control" readonly>
+					</div>
 
-				</div>
+					<div class="form-group">
+						<label for="subject">Subject:</label>
+						<input type="text" id="subject" name="subject" placeholder="Full Day Leave for XYZ Reason"
+							   class="form-control" required>
+					</div>
+
+					<div class="form-group">
+						<label for="body">Body:</label>
+						<textarea id="body" name="body" class="form-control" rows="6"
+								  placeholder="Respected [Recipient's Name],
+
+							[Body Paragraph 1].
+							[Body Paragraph 2].
+							Your Sincerely,
+							[Your Name]
+							[Your Roll No]
+							[Your Group ID]">
+
+						</textarea>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-md-2 col-form-label">Duration:</label>
+						<div class="col-md-2">
+							<label for="fromDate" class="col-form-label">From:</label>
+							<input type="date" id="fromDate" name="fromDate" class="form-control" required>
+						</div>
+						<div class="col-md-2">
+							<label for="toDate" class="col-form-label">To:</label>
+							<input type="date" id="toDate" name="toDate" class="form-control" required>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="leaveType">Leave Type:</label>
+						<select id="leaveType" name="leaveType" class="form-control" required onchange="setDates()">
+							<option value="Full Day">Full Day</option>
+							<option value="Half Day">Half Day</option>
+						</select>
+					</div>
+
+					<script>
+						document.addEventListener('DOMContentLoaded', function () {
+							const leaveType = document.getElementById('leaveType');
+							const fromDate = document.getElementById('fromDate');
+							const toDate = document.getElementById('toDate');
+
+							// Function to set today's date in YYYY-MM-DD format
+							function getTodayDate() {
+								const today = new Date();
+								const yyyy = today.getFullYear();
+								const mm = String(today.getMonth() + 1).padStart(2, '0');
+								const dd = String(today.getDate()).padStart(2, '0');
+								return `${yyyy}-${mm}-${dd}`;
+							}
+
+							// Event listener for leave type change
+							leaveType.addEventListener('change', function () {
+								if (this.value === 'Half Day') {
+									const today = getTodayDate();
+									fromDate.value = today;
+									toDate.value = today;
+									fromDate.setAttribute('readonly', true);
+									toDate.setAttribute('readonly', true);
+								} else {
+									fromDate.removeAttribute('readonly');
+									toDate.removeAttribute('readonly');
+									fromDate.value = ''; // Clear previous values
+									toDate.value = '';
+								}
+							});
+						});
+					</script>
+					<div class="form-group mt-4">
+						<p>
+							<span><b>Note: </b></span>
+							<span class="text-danger">"For each instance of leave taken, it is mandatory to obtain a physical signature on paper as part of the documentation process."</span>
+						</p>
+					</div>
+
+					<div class="form-group text-center">
+						<button type="button" class="btn btn-primary" onclick="validateAndSubmit()">
+							Submit
+						</button>
+
+					</div>
+
+				</form>
 			</div>
 		</div>
+	</div>
 
-		<!-- Include the footer fragment -->
-		<div th:replace="fragments/footerFragment :: footer"></div>
-	</main>
+	<!-- Leave History Table -->
+	<div class="container mt-2">
+		<div class="card">
+			<div class="card-header">
+				<h3 class="text-dark">Leave History</h3>
+			</div>
+			<div class="card-body">
+				<table class="table">
+					<thead>
+					<tr>
+						<th>Leave ID</th>
+						<th>Subject</th>
+						<th>Submitted On</th>
+						<th>From</th>
+						<th>To</th>
+						<th>Status</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr th:each="leave : ${leaveHistory}" th:if="${leaveHistory != null and not #lists.isEmpty(leaveHistory)}">
+						<td th:text="${leave.id}"></td>
+						<td th:text="${leave.subject}"></td>
+						<td th:text="${#dates.format(T(java.util.Date).from(leave.submittedOn.atZone(T(java.time.ZoneId).systemDefault()).toInstant()), 'dd-MM-yyyy HH:mm:ss')}"></td>
+						<td th:text="${#temporals.format(leave.fromDate, 'dd-MM-yyyy')}"></td>
+						<td th:text="${#temporals.format(leave.toDate, 'dd-MM-yyyy')}"></td>
+						<td>
+                                    <span th:class="${leave.status == 'Approved' ? 'text-success' : (leave.status == 'Rejected' ? 'text-danger' : 'text-warning')}"
+										  th:text="${leave.status}">
+                                    </span>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div th:replace="fragments/footerFragment :: footer"></div>
+</main>
 
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-	<script
-		src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-	<script
-		src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-	<!-- Bootstrap JS is used for the card layout in this example -->
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmLeaveModal" tabindex="-1" aria-labelledby="confirmLeaveModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="confirmLeaveModalLabel">Confirm Leave Application</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				Are you sure you want to submit this leave application?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+				<button type="submit" class="btn btn-primary" onclick="document.querySelector('form').submit()">Yes, Submit</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	function validateAndSubmit() {
+		const subject = document.getElementById('subject').value.trim();
+		const body = document.getElementById('body').value.trim();
+		const fromDate = document.getElementById('fromDate').value;
+		const toDate = document.getElementById('toDate').value;
+
+		const errorMessages = [];
+
+		if (!subject) errorMessages.push("Subject is required.");
+		if (!body) errorMessages.push("Body is required.");
+		if (!fromDate) errorMessages.push("From Date is required.");
+		if (!toDate) errorMessages.push("To Date is required.");
+
+		if (errorMessages.length > 0) {
+			alert("Please fill in the following fields:\n\n" + errorMessages.join("\n"));
+		} else {
+			// Show confirmation modal if all fields are valid
+			const confirmModal = new bootstrap.Modal(document.getElementById('confirmLeaveModal'));
+			confirmModal.show();
+		}
+	}
+</script>
+
+
+<!-- Bootstrap JS Bundle (includes Popper) -->
+
+
+<!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>-->
+<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>-->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
-
 </html>
