@@ -47,12 +47,18 @@
             padding-bottom: initial;
             transition: background-color 0.1s ease, border-radius 0.1s ease, padding 0.1s ease;
         }
+        .unread-report {
+            border: 2px solid red !important;
+        }
 
-
-
-
-
-      .reportsearch {
+        .unread-marker {
+            color: red;
+            font-weight: bold;
+            display: block;
+            text-align: right;
+            margin-top: 5px;
+        }
+        .reportsearch {
             display: flex;
             flex-direction: row;
             justify-content: space-between;
@@ -120,20 +126,20 @@
         <!-- Search Input -->
 
         <div class="reportsearch" >
-        <input type="text" class="mb-3 mt-2 pr-5" id="searchInput" placeholder="Start typing...">
+            <input type="text" class="mb-3 mt-2 pr-5" id="searchInput" placeholder="Start typing...">
 
-<!--         Date Filter-->
-        <div class="container mt-2">
-             <form method="GET" action="/bisag/admin/admin_yearly_report">
-            <label for="dateFilter"><b>Select Date:</b></label>
-            <input type="date" id="dateFilter" name="date" class="form-control w-25 d-inline-block ml-2"
-                   th:value="${selectedDate}" required>
-            <button type="submit"  class="btn btn-primary " style="background-color: #0a58ca" >Filter</button>
-        </form>
-        </div>
+            <!--         Date Filter-->
+            <div class="container mt-2">
+                <form method="GET" action="/bisag/admin/admin_yearly_report">
+                    <label for="dateFilter"><b>Select Date:</b></label>
+                    <input type="date" id="dateFilter" name="date" class="form-control w-25 d-inline-block ml-2"
+                           th:value="${selectedDate}" required>
+                    <button type="submit"  class="btn btn-primary " style="background-color: #0a58ca" >Filter</button>
+                </form>
+            </div>
         </div>
 
-  </div>
+    </div>
 
     <script>
         document.getElementById("dateFilter").addEventListener("change", function() {
@@ -143,7 +149,12 @@
 
     <ul class="nav nav-tabs nav-justified">
         <li class="nav-item"><a class="nav-link active" id="tab1" href="javascript:void(0)"
-                                onclick="switchTab('form1', 'tab1')">Weekly Report</a></li>
+                                onclick="switchTab('form1', 'tab1')">Weekly Report
+            <span th:if="${totalUnreadReports > 0}"
+                  th:text="${totalUnreadReports}"
+                  class="badge badge-danger ml-2">
+    </span>
+        </div></a></li>
         <li class="nav-item"><a class="nav-link" id="tab2" href="javascript:void(0)"></a></li>
     </ul>
 
@@ -158,8 +169,13 @@
                             <th style="width: 5%;"><i class="fa-solid fa-chevron-down"></i></th>
                             <th style="width: 15%;">Group ID: <a
                                     th:href="@{'/bisag/admin/allocate_guide/' + ${group.groupId}}"><span
-                                    th:text="${group.groupId}"></span></a></th>
-                            <th style="width: 30%;"><span th:text="'Project: ' + ${group.projectDefinition}"></span></th>
+                                    th:text="${group.groupId}"></span></a>
+                                <!-- Show unread reports count as a badge -->
+                                <span th:if="${unreadReportCounts[group.groupId] > 0}"
+                                      th:text="'(' + ${unreadReportCounts[group.groupId]} + ')'"
+                                      class="badge badge-danger ml-2">
+    </span></th>
+                            <th style="width: 30%;"><span th:text="'Project: ' + (${group.projectDefinition} ?: 'The definition is not decided yet.')"></span></th>
                             <th style="width: 20%;"><span th:text="'Guide: ' + ${group.guide.name}"></span></th>
                         </tr>
                     </table>
@@ -171,26 +187,22 @@
                         <div class="row">
                             <!-- Iterate over each report for the selected group -->
                             <div th:each="report : ${reports}" th:if="${group.id == report.group.id}" class="col-md-4">
-                                <div class="card">
+                                <div class="card" th:classappend="${report.isRead == 0 ? 'unread-report' : ''}">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div class="card-title">
                                                 <h5 class="mb-0" th:text="'Week - ' + ${report.weekNo}"></h5>
                                             </div>
-                                            <!-- Three dots icon -->
+
+                                            <!-- Three dots menu -->
                                             <div class="dropdown icon-container">
                                                 <i class="fa-solid fa-ellipsis-vertical" data-toggle="dropdown"
                                                    role="button" aria-haspopup="true" aria-expanded="false"></i>
                                                 <div class="dropdown-menu">
-<!--                                                    <a th:href="@{'/files/weekly_reports/' + ${group.groupId} + '/' + ${report.submittedPdf}}"-->
-<!--                                                       target="_blank" class="dropdown-item">View Report</a>-->
-
                                                     <a th:href="@{/bisag/admin/viewPdf/{internId}/{weekNo}(internId=${report.intern.internId}, weekNo=${report.weekNo})}"
-                                                       target="_blank"
-                                                       class="dropdown-item">
+                                                       width="1000" height="800" class="dropdown-item">
                                                         View Report
                                                     </a>
-
                                                     <a th:href="@{'/bisag/admin/admin_weekly_report_details/' + ${group.groupId} + '/' + ${report.weekNo}}"
                                                        class="dropdown-item">Details</a>
                                                 </div>
@@ -212,7 +224,7 @@
                                             </tr>
                                             <tr>
                                                 <td>Submitted By:</td>
-                                                <td th:text="${report.intern.firstName} + ' ' + ${report.intern.lastName}"></td>
+                                                <td th:text="${report.intern.firstName}"></td>
                                             </tr>
                                             <tr>
                                                 <td>Status:</td>
@@ -222,8 +234,9 @@
                                             <tr th:if="${#lists.isEmpty(reports)}">
                                                 <td colspan="8" class="text-center">No reports found before the selected date.</td>
                                             </tr>
-
                                         </table>
+
+<!--                                        <span th:if="${report.isRead == 0}" class="unread-marker">🔴 Unread</span>-->
                                     </div>
                                 </div>
                             </div>
